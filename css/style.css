@@ -9,7 +9,7 @@ body {
   font-family: 'Roboto', sans-serif;
   line-height: 1.6;
   color: #ffffff;
-  background-color: #0a0a0a;
+  background-color: #121212; /* Grayish-black base like PixelRazer */
 }
 
 h1, h2, h3 {
@@ -20,9 +20,9 @@ h1, h2, h3 {
   font-weight: 700;
 }
 
-/* Header/Hero - Dark gradient with red glow */
+/* Header/Hero - Dark gradient with red glow, grayish tones */
 header {
-  background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
+  background: linear-gradient(135deg, #121212 0%, #1e1e1e 50%, #2d2d2d 100%);
   color: #ffffff;
   text-align: center;
   padding: 120px 20px;
@@ -72,7 +72,7 @@ header p {
 
 /* Navigation - Slim, dark bar with red links */
 nav {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(18, 18, 18, 0.8); /* Grayish-black nav */
   backdrop-filter: blur(10px);
   padding: 1rem;
   position: sticky;
@@ -102,7 +102,7 @@ nav a:hover {
   text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
-/* Sections - Alternating dark shades */
+/* Sections - Alternating dark grays */
 section {
   padding: 80px 20px;
   max-width: 1200px;
@@ -110,7 +110,7 @@ section {
 }
 
 #about {
-  background: #1a1a2e;
+  background: #1e1e1e; /* Lighter dark gray for sections */
   text-align: center;
 }
 
@@ -125,7 +125,7 @@ section {
 }
 
 #projects {
-  background: #0a0a0a;
+  background: #121212; /* Base gray-black */
 }
 
 .project-grid {
@@ -136,7 +136,7 @@ section {
 }
 
 .project-card {
-  background: #16213e;
+  background: #2d2d2d; /* Grayish card base */
   border: 1px solid #ff0000;
   border-radius: 5px; /* Slight round for modern feel; set to 0 for pixel-sharp */
   overflow: hidden;
@@ -207,7 +207,7 @@ section {
 /* Contact & Footer - Neon accents */
 #contact {
   text-align: center;
-  background: #1a1a2e;
+  background: #1e1e1e; /* Matching section gray */
 }
 
 #contact a {
@@ -223,7 +223,7 @@ section {
 footer {
   text-align: center;
   padding: 30px;
-  background: #000000;
+  background: #121212; /* Gray-black footer */
   color: #666666;
   border-top: 1px solid #ff0000;
 }
@@ -242,7 +242,7 @@ footer a {
 
 /* Writeups Specific */
 #writeups {
-  background: #0a0a0a;
+  background: #121212; /* Base gray-black */
   padding: 80px 20px;
 }
 
@@ -255,7 +255,7 @@ footer a {
 }
 
 .writeup-card {
-  background: #16213e;
+  background: #2d2d2d; /* Grayish card base */
   border: 1px solid #ff0000;
   border-radius: 5px;
   overflow: hidden;
@@ -311,7 +311,7 @@ footer a {
   display: flex;
   flex-wrap: wrap;
   padding: 80px 20px;
-  background: #1a1a2e;
+  background: #1e1e1e; /* Section gray */
   align-items: center;
   gap: 40px;
 }
@@ -392,7 +392,7 @@ footer a {
 }
 
 .alt-bg {
-  background: linear-gradient(135deg, #0a0a0a 0%, #16213e 100%);
+  background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%); /* Gray gradient alt */
 }
 
 /* Mobile */

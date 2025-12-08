@@ -238,3 +238,69 @@ footer a {
   .project-grid { grid-template-columns: 1fr; }
   section { padding: 60px 15px; }
 }
+
+/* Writeups Specific */
+#writeups {
+  background: #0a0a0a;
+  padding: 80px 20px;
+}
+
+.writeups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.writeup-card {
+  background: #16213e;
+  border: 1px solid #00ffff;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 30px;
+}
+
+.writeup-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+  border-color: #ffffff;
+}
+
+.writeup-card h3 {
+  color: #00ffff;
+  margin-bottom: 10px;
+}
+
+.writeup-card .date {
+  color: #666666;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.writeup-card p {
+  color: #cccccc;
+  margin-bottom: 20px;
+}
+
+.writeup-card a {
+  color: #00ffff;
+  text-decoration: none;
+  border: 1px solid #00ffff;
+  padding: 8px 16px;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+.writeup-card a:hover {
+  background: #00ffff;
+  color: #000000;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .writeups-grid { grid-template-columns: 1fr; }
+}

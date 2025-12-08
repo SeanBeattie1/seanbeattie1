@@ -1,40 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Write-Ups</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script defer src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writeups | Sean Beattie</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar">
-        <ul class="nav-links">
-            <li><a href="home.html">Home</a></li>
-            <li><a href="writeups.html">Write-Ups</a></li>
-            <li><a href="projects.html">Projects</a></li>
-        </ul>
-    </nav>
+  <nav>
+    <ul>
+      <li><a href="index.html#home">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="writeups.html">Writeups</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-    <section class="write-ups">
-        <h1>Write-Ups</h1>
-        <div class="write-ups-container">
-            <!-- Add your write-up cards here -->
-            <!-- Example structure:
-            <a href="your-writeup.html" class="write-up-card">
-                <img src="images/your-image.png" alt="Description" class="card-image">
-                <div class="card-content">
-                    <h3>Title</h3>
-                    <p>Short description of your write-up.</p>
-                </div>
-            </a>
-            -->
-        </div>
-    </section>
+  <header id="home">
+    <h1>Writeups</h1>
+    <p>Deep Dives & Code Chronicles | Pixel-Sharp Insights from the Trenches</p>
+  </header>
+
+  <section id="writeups">
+    <div class="writeups-grid">
+      <article class="writeup-card">
+        <h3>CTF Challenge: Breaking the Enigma</h3>
+        <p class="date">December 2025</p>
+        <p>A step-by-step teardown of a custom crypto puzzle. From reverse engineering to exploiting weak keys—lessons in Python and Wireshark.</p>
+        <a href="writeups/enigma-breakdown.html">Read More</a> <!-- Link to full post -->
+      </article>
+      <article class="writeup-card">
+        <h3>Optimizing React Renders: A Razer Guide</h3>
+        <p class="date">November 2025</p>
+        <p>Diving into memoization and hooks to slash load times. Includes benchmarks and code snippets for your next pixel-perfect app.</p>
+        <a href="writeups/react-razor.html">Read More</a>
+      </article>
+      <!-- Add more: Aim for 4-6; create sub-pages like writeups/[slug].html for full content -->
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Sean Beattie. Razer-sharp with ❤️ on GitHub Pages.</p>
+  </footer>
+
+  <script src="js/script.js"></script>
 </body>
 </html>
-
-
-
-
-

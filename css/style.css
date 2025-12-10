@@ -375,37 +375,34 @@ a:focus, .project-card:focus, .writeup-card:focus { outline:2px solid var(--acce
   text-decoration: underline;
 }
 
-/* ============================================================= */
-/*  FIX: Profile picture = circle | HTB badge = rectangle        */
-/* ============================================================= */
-
-header .profile-pic {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--accent-color);
-  box-shadow: 0 0 30px var(--shadow-color);
-  margin-bottom: 20px;
+/* Force HTB badge to be rectangular — overrides their circular PNG */
+.htb-banner {
+  margin-top: 30px;
 }
 
-/* HTB badge – keep it rectangular with nice hover */
-.htb-banner img {
-  border-radius: 12px !important;   /* 12px matches the reference style better */
-  width: 340px;
-  max-width: 90vw;                  /* responsive on mobile */
-  height: auto;
-  transition: transform 0.3s ease;
+.htb-banner a {
+  display: block;
+  background: #1a1a1a;           /* dark card background */
+  padding: 12px;
+  border-radius: 16px;           /* nice rounded rectangle */
+  border: 1px solid var(--border-color);
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  width: fit-content;
+  margin: 0 auto;
 }
 
-.htb-banner:hover img {
-  transform: scale(1.05);
+.htb-banner img {
+  display: block;
+  border-radius: 12px !important;   /* sharp corners on the image */
+  width: 340px !important;
+  height: auto !important;
+  background: #1a1a1a;               /* fills transparent parts */
+  box-shadow: none;
 }
 
-/* Optional: center the badge nicely on mobile */
-@media (max-width: 768px) {
-  .htb-banner img {
-    width: 300px;
-  }
+.htb-banner:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(99,102,241,0.2);
 }

@@ -374,3 +374,38 @@ a:focus, .project-card:focus, .writeup-card:focus { outline:2px solid var(--acce
   color: #8b5cf6;
   text-decoration: underline;
 }
+
+/* ============================================================= */
+/*  FIX: Profile picture = circle | HTB badge = rectangle        */
+/* ============================================================= */
+
+header .profile-pic {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 0 30px var(--shadow-color);
+  margin-bottom: 20px;
+}
+
+/* HTB badge – keep it rectangular with nice hover */
+.htb-banner img {
+  border-radius: 12px !important;   /* 12px matches the reference style better */
+  width: 340px;
+  max-width: 90vw;                  /* responsive on mobile */
+  height: auto;
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.htb-banner:hover img {
+  transform: scale(1.05);
+}
+
+/* Optional: center the badge nicely on mobile */
+@media (max-width: 768px) {
+  .htb-banner img {
+    width: 300px;
+  }
+}

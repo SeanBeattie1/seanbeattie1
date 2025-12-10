@@ -375,34 +375,29 @@ a:focus, .project-card:focus, .writeup-card:focus { outline:2px solid var(--acce
   text-decoration: underline;
 }
 
-/* Force HTB badge to be rectangular — overrides their circular PNG */
+/* Official HTB rectangular badge — clean & perfect */
 .htb-banner {
-  margin-top: 30px;
+  margin-top: 32px;
+  text-align: center;
 }
 
 .htb-banner a {
-  display: block;
-  background: #1a1a1a;           /* dark card background */
-  padding: 12px;
-  border-radius: 16px;           /* nice rounded rectangle */
-  border: 1px solid var(--border-color);
+  display: inline-block;
+  border-radius: 16px;                    /* smooth corners */
+  overflow: hidden;
+  border: 1px solid #333;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   transition: all 0.3s ease;
-  overflow: hidden;
-  width: fit-content;
-  margin: 0 auto;
 }
 
 .htb-banner img {
   display: block;
-  border-radius: 12px !important;   /* sharp corners on the image */
-  width: 340px !important;
-  height: auto !important;
-  background: #1a1a1a;               /* fills transparent parts */
-  box-shadow: none;
+  height: 80px;          /* standard HTB badge height */
+  width: auto;
+  border-radius: 14px;
 }
 
-.htb-banner:hover {
+.htb-banner a:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(99,102,241,0.2);
+  box-shadow: 0 20px 40px rgba(99,102,241,0.25);
 }

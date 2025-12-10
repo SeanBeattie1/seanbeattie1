@@ -334,3 +334,43 @@ a:focus, .project-card:focus, .writeup-card:focus { outline:2px solid var(--acce
 .skills-list li:hover::before {
   left: 100%;
 }
+
+/* ───── Perfectly centered About & Contact sections ───── */
+#about,
+#contact {
+  text-align: center;
+  max-width: 900px;
+  margin: 100px auto;           /* vertical spacing + horizontal centering */
+  padding: 60px 40px;
+  background: var(--card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top shimmer line (exactly like the reference) */
+#about::before,
+#contact::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gradient-accent);
+  animation: shimmer 2s linear infinite;
+}
+
+/* Optional: make contact links look nicer */
+.contact-links p {
+  margin: 12px 0;
+  font-size: 1.1rem;
+}
+.contact-links a {
+  color: var(--accent-color);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.contact-links a:hover {
+  color: #8b5cf6;
+  text-decoration: underline;
+}

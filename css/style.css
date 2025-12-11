@@ -213,10 +213,10 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 .card-content h3 { font-size: 1.5rem; color: var(--accent-color); margin-bottom: 10px; }
 .card-content p { color: var(--text-secondary); }
 
-/* Code blocks & scrollbar — EVEN SMALLER & MORE COMPACT LIKE PIXELRAZER */
+/* Code blocks & scrollbar — COMPACT LIKE PIXELRAZER */
 .snippet {
-  margin: 18px 0;
-  border-radius: 10px;
+  margin: 25px 0;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border-color);
   background: #0d1117;
@@ -226,9 +226,9 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
   background: #0d1117;
   color: #c9d1d9;
   font-family: 'JetBrains Mono', monospace;
-  padding: 10px 14px;      /* Even less padding */
-  font-size: 0.80rem;      /* Smaller font for denser look */
-  line-height: 1.3;        /* Tighter lines */
+  padding: 20px;
+  font-size: 0.9rem;       /* Exact Pixelrazer size */
+  line-height: 1.5;
   overflow-x: auto;
   position: relative;
 }
@@ -247,49 +247,67 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 ::-webkit-scrollbar-track { background: var(--secondary-bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
 
-/* ───── WRITE-UP HEADINGS — MUCH SMALLER TO FORCE CHANGE ───── */
+/* ───── WRITE-UP CONTENT PAGES — EXACTLY LIKE PIXELRAZER ───── */
+.contents {
+    max-width: 1000px;
+    margin: 120px auto 60px auto;
+    padding: 0 20px;
+}
+
 .contents h1 {
-  text-align: center;
-  font-size: 2.2rem !important;    /* Even smaller + !important to override cache */
-  font-weight: 700;
-  margin: 60px 0 40px 0 !important;
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+    background: var(--gradient-accent);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .contents h2 {
-  color: var(--accent-color) !important;
-  font-size: 1.8rem !important;    /* Smaller */
-  font-weight: 700;
-  margin: 50px 0 18px 0 !important;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.contents h2::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, var(--accent-color), transparent);
+    color: var(--accent-color);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 40px 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .contents h3 {
-  color: var(--accent-secondary) !important;
-  font-size: 1.4rem !important;    /* Smaller */
-  font-weight: 600;
-  margin: 28px 0 14px 0 !important;
+    color: var(--accent-secondary);
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: 30px 0 15px 0;
 }
 
 .contents p {
-  color: var(--text-secondary);
-  line-height: 1.8, 8;
-  margin-bottom: 20px;
-  font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.contents img {
+    display: block;
+    margin: 30px auto;
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.contents img:hover {
+    transform: scale(1.02);
+}
+
+/* Image Size Classes */
+.big-to-normal-image img {
+    max-width: 600px;
+}
+
+.small-to-big-image img {
+    max-width: 1200px;
 }
 
 /* Responsive & Accessibility */
@@ -299,8 +317,21 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
   header h1 { font-size:2.8rem; } 
   .project-grid, .writeups-grid { grid-template-columns:1fr; } 
 
-  .contents h1 { font-size: 2.0rem !important; margin: 50px 0 35px 0 !important; }
-  .contents h2 { font-size: 1.7rem !important; margin: 45px 0 15px 0 !important; }
-  .contents h3 { font-size: 1.3rem !important; margin: 22px 0 10px 0 !important; }
+  .contents {
+    margin-top: 100px;
+    padding: 0 15px;
+  }
+
+  .contents h1 {
+    font-size: 2.5rem;
+  }
+
+  .contents h2 {
+    font-size: 1.7rem;
+  }
+
+  .contents h3 {
+    font-size: 1.3rem;
+  }
 }
 ::selection { background:var(--accent-color); color:#000; }

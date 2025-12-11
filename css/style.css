@@ -247,12 +247,12 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 ::-webkit-scrollbar-track { background: var(--secondary-bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
 
-/* ───── WRITE-UP HEADINGS — EVEN SMALLER TO MATCH PIXELRAZER EXACTLY ───── */
+/* ───── WRITE-UP HEADINGS — MUCH SMALLER TO FORCE CHANGE ───── */
 .contents h1 {
   text-align: center;
-  font-size: 2.5rem;       /* Smaller title (Pixelrazer uses ~2.5-2.8rem) */
+  font-size: 2.2rem !important;    /* Even smaller + !important to override cache */
   font-weight: 700;
-  margin: 70px 0 50px 0;
+  margin: 60px 0 40px 0 !important;
   background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
@@ -260,10 +260,10 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 }
 
 .contents h2 {
-  color: var(--accent-color);
-  font-size: 1.9rem;       /* Smaller main sections */
+  color: var(--accent-color) !important;
+  font-size: 1.8rem !important;    /* Smaller */
   font-weight: 700;
-  margin: 60px 0 20px 0;
+  margin: 50px 0 18px 0 !important;
   position: relative;
   padding-bottom: 10px;
 }
@@ -279,15 +279,15 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 }
 
 .contents h3 {
-  color: var(--accent-secondary);
-  font-size: 1.5rem;       /* Smaller subheadings */
+  color: var(--accent-secondary) !important;
+  font-size: 1.4rem !important;    /* Smaller */
   font-weight: 600;
-  margin: 30px 0 15px 0;
+  margin: 28px 0 14px 0 !important;
 }
 
 .contents p {
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.8, 8;
   margin-bottom: 20px;
   font-size: 1.1rem;
 }
@@ -299,8 +299,8 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
   header h1 { font-size:2.8rem; } 
   .project-grid, .writeups-grid { grid-template-columns:1fr; } 
 
-  .contents h1 { font-size: 2.2rem; margin: 60px 0 40px 0; }
-  .contents h2 { font-size: 1.8rem; margin: 50px 0 18px 0; }
-  .contents h3 { font-size: 1.4rem; margin: 25px 0 12px 0; }
+  .contents h1 { font-size: 2.0rem !important; margin: 50px 0 35px 0 !important; }
+  .contents h2 { font-size: 1.7rem !important; margin: 45px 0 15px 0 !important; }
+  .contents h3 { font-size: 1.3rem !important; margin: 22px 0 10px 0 !important; }
 }
 ::selection { background:var(--accent-color); color:#000; }

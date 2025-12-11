@@ -109,20 +109,24 @@ header h1 {
     -webkit-text-fill-color: transparent;
 }
 
-/* ——— HTB BADGE — EXACTLY LIKE PIXELRAZER (100% WORKING) ——— */
+/* ——— HTB BADGE — EXACTLY LIKE PIXELRAZER + FULLY CLICKABLE + CORRECT SIZE ——— */
 .htb-banner {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 0;
   margin: 40px 0;
+  z-index: 10;
+  position: relative;
 }
 
 .htb-badge {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 12px;
   overflow: hidden;
-  display: block;
+  display: inline-block;
+  cursor: pointer !important;
+  pointer-events: auto !important;
 }
 
 .htb-badge:hover {
@@ -131,14 +135,27 @@ header h1 {
 }
 
 .htb-badge img {
-  width: 340px;
-  max-width: 95vw;
+  width: 360px;               /* Exact Pixelrazer desktop size */
+  max-width: 94vw;
   height: auto;
   display: block;
   border-radius: 12px;
+  pointer-events: none;       /* Clicks go to the <a> tag */
 }
 
-/* ───── Sections, Cards, etc. (everything else unchanged) ───── */
+/* Mobile sizing */
+@media (max-width: 768px) {
+  .htb-badge img {
+    width: 320px;
+  }
+}
+@media (max-width: 480px) {
+  .htb-badge img {
+    width: 290px;
+  }
+}
+
+/* ───── Sections, Cards, etc. ───── */
 section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 #about, #contact {
     text-align: center;
@@ -186,7 +203,7 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 .contact-links a { color: var(--accent-color); font-weight: 500; transition: all 0.3s ease; }
 .contact-links a:hover { color: #8b5cf6; text-decoration: underline; }
 
-/* Rest of your cards, code blocks, etc. remain exactly as before */
+/* Cards */
 .project-grid, .writeups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; margin-top: 50px; }
 .project-card, .writeup-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
 .project-card:hover, .writeup-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.4); border-color: var(--accent-color); }
@@ -196,7 +213,7 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 .card-content h3 { font-size: 1.5rem; color: var(--accent-color); margin-bottom: 10px; }
 .card-content p { color: var(--text-secondary); }
 
-/* Code blocks & scrollbar (unchanged) */
+/* Code blocks & scrollbar */
 pre, .code-block { background: #0d1117; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; padding: 20px; border-radius: 12px; overflow-x: auto; border: 1px solid var(--border-color); position: relative; }
 .code-block::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent-color); }
 ::-webkit-scrollbar { width: 8px; }

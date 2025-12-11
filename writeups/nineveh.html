@@ -4,30 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nineveh Write-up</title>
-    <link rel="stylesheet" href="../style.css">
-    <script defer src="../script.js"></script>
+    <link rel="stylesheet" href="/seanbeattie1/css/style.css"> <!-- Fixed absolute path for GitHub Pages -->
+    <script defer src="/seanbeattie1/js/script.js"></script> <!-- Fixed absolute path -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <nav class="navbar">
             <ul class="nav-links">
-                <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="../writeups.html"><i class="fas fa-file-alt"></i> Write-Ups</a></li>
-                <li><a href="../projects.html"><i class="fas fa-user-secret"></i> Projects</a></li>
+                <li><a href="/seanbeattie1/index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/seanbeattie1/writeups.html"><i class="fas fa-file-alt"></i> Write-Ups</a></li>
+                <li><a href="/seanbeattie1/projects.html"><i class="fas fa-user-secret"></i> Red Team</a></li>
             </ul>
         </nav>
         <div class="contents">
             <h1>Nineveh Write-up</h1>
             <div class="big-to-normal-image">
-                <img src="../images/nineveh.png" alt="Nineveh">
+                <img src="/seanbeattie1/images/nineveh.png" alt="Nineveh"> <!-- Fixed path, add image if needed -->
             </div>
             <p>This write-up focuses on the Hack The Box machine "Nineveh," which is part of TJnull's recommended list for OSCP preparation. Nineveh centers on web application vulnerabilities, particularly exploiting weaknesses in phpLiteAdmin and a custom web interface, along with using advanced techniques like port knocking and a known vulnerability in Chkrootkit for privilege escalation.</p>
             <h2>Enumeration</h2>
             <p>I began by performing an Nmap scan on the target host to identify open ports and services. Once the scan completed, it revealed two open ports: port 80 (HTTP) and port 443 (HTTPS). This discovery strongly indicated that the target was hosting a web server.</p>
             <div class="snippet">
-                <pre class="code-block">
-nmap -A -v 10.129.238.84
+                <pre class="code-block">nmap -A -v 10.129.238.84
 Starting Nmap 7.94 ( https://nmap.org ) at 2024-11-15 15:44 CST
 NSE: Loaded 156 scripts for scanning.
 NSE: Script Pre-scanning.
@@ -341,7 +340,7 @@ LinEnum.sh          100%[===================>]  45.54K  --.-KB/s    in 0.1s
 www-data@nineveh:/tmp$ ls
 LinEnum.sh
 f
-systemd-private-3e4242aa0160168461390fbe3898a4d3734-systemd-timesyncd.service-ZoZvad
+systemd-private-3e4242aa0168461390fbe3898a4d3734-systemd-timesyncd.service-ZoZvad
 vmware-root
 www-data@nineveh:/tmp$ bash LinEnum.sh
 bash LinEnum.sh
@@ -350,12 +349,13 @@ bash LinEnum.sh
 # Local Linux Enumeration & Privilege Escalation Script #
 #########################################################
 # www.rebootuser.com
-# version 0.982</pre>
+# version 0.982
+                </pre>
             </div>
 
             <h3>Chkrootkit</h3>
             <p>While reviewing the results from the LinEnum script, I didn't find much of interest on the system. However, as I continued exploring, I came across a few directories I hadn't checked yet, including /report. Upon examining this directory, I noticed that a new file was being created every minute. Curious about the source of this file, I uploaded and ran a Bash script designed to track the process responsible for it. The script immediately returned results, and upon reviewing them, I discovered that Chkrootkit was creating these files.</p>
-            <p>Chkrootkit is a tool used for detecting rootkits, and it was configured to run periodically as part of a scheduled cron job. It generates log files to document its findings, and these were being created every minute within the report directory. I then decided to do some further investigation of Chkrootkit, which led me to a CVE related to it that involved a Local Privilege Escalation vulnerability. This vulnerability allowed Chkrootkit to execute a file called /tmp/update. I then realized that if I were to place a file named update in the /tmp directory containing a reverse shell, I could potentially trigger Chkrootkit to execute the reverse shell and gain root access.</p>
+            <p>Chkrootkit is a tool used for detecting rootkits, and it was configured to run periodically as part of a scheduled cron job. It generates log files to document its findings, and these were being created every minute within the report directory. I then decided to do some further investigation of Chkrootkit, which led to a CVE related to it that involved a Local Privilege Escalation vulnerability. This vulnerability allowed Chkrootkit to execute a file called /tmp/update. I then realized that if I were to place a file named update in the /tmp directory containing a reverse shell, I could potentially trigger Chkrootkit to execute the reverse shell and gain root access.</p>
 
             <div class="snippet">
                 <pre class="code-block">www-data@nineveh:/var/www/html/department$ cd /tmp

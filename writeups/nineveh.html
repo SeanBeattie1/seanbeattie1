@@ -28,6 +28,7 @@
       <p>This write-up focuses on the Hack The Box machine "Nineveh," which is part of TJnull's recommended list for OSCP preparation. Nineveh centers on web application vulnerabilities, particularly exploiting weaknesses in phpLiteAdmin and a custom web interface, along with using advanced techniques like port knocking and a known vulnerability in Chkrootkit for privilege escalation.</p>
 
       <h2>Enumeration</h2>
+      <h3>Nmap Scan</h3>
       <p>I began by performing an Nmap scan on the target host to identify open ports and services. Once the scan completed, it revealed two open ports: port 80 (HTTP) and port 443 (HTTPS). This discovery strongly indicated that the target was hosting a web server.</p>
 
       <div class="snippet">
@@ -46,7 +47,7 @@ Nmap done: 1 IP address (1 host up) scanned in 30.86 seconds
            Raw packets sent: 2088 (95.444KB) | Rcvd: 544 (232.948KB)</pre>
       </div>
 
-      <p>Port 80 and 443</p>
+      <h2>Port 80 and 443</h2>
       <p>When I navigated to the website hosted on port 80, I encountered a default webpage for the webserver, providing no immediately useful information. I then decided to visit the site on port 443. This site displayed an image, but like the default webpage on port 80, it offered little to work with.</p>
       <p>To gather more information, I decided to run two Gobuster scans - one for each port - to search for hidden directories and files. I also executed a Nikto scan to identify potential vulnerabilities or misconfigurations within the webserver that could aid in advancing my investigation.</p>
 

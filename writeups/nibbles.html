@@ -52,15 +52,15 @@ Nmap done: 1 IP address (1 host up) scanned in 18.26 seconds</pre>
       <p>Upon visiting the website, I saw that it only displayed a simple “Hello World” message. Suspecting there were additional hidden directories, I proceeded to run an ffuf scan to uncover them.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/nibbles_port80.webp" alt="Port 80 webpage">
+        <img src="../images/nibbles1.webp" alt="Port 80 webpage">
       </div>
 
       <h2>Source Page & /nibbleblog Directory</h2>
       <p>After the scan finished, I didn’t find any new directories, so I decided to revisit the webpage to see if I had overlooked something. That’s when it hit me — I hadn’t checked the page source yet. Sure enough, in the source code, I found a comment revealing a hidden directory named /nibbleblog/. Navigating to this directory, I was greeted by a blog page.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/nibbles_source.webp" alt="Page source comment">
-        <img src="../images/nibbles_blog.webp" alt="Nibbleblog main page">
+        <img src="../images/nibbles2.webp" alt="Page source comment">
+        <img src="../images/nibbles3.webp" alt="Nibbleblog main page">
       </div>
 
       <h2>Ffuf Scan</h2>
@@ -94,27 +94,27 @@ Nmap done: 1 IP address (1 host up) scanned in 18.26 seconds</pre>
       <p>When I explored the /admin.php directory, I was presented with a login panel. This immediately caught my attention, especially since the Nikto scan had flagged this directory in relation to several CVE vulnerabilities. Given this connection, I suspected that the login panel could be vulnerable.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/nibbles_admin_login.webp" alt="Admin login panel">
+        <img src="../images/nibbles4.webp" alt="Admin login panel">
       </div>
 
       <h2>Easy News Version 4.4.1</h2>
       <p>Upon reviewing the CVE links, I discovered that they pointed to a known vulnerability in Easynews, specifically in the /admin.php directory, which allows for authentication bypass. The issue stems from the fact that this version of Easynews doesn't properly validate whether an administrator has logged in with the correct username and password, effectively allowing unauthorized access. Given that the target host was running Easynews version 4.3, which falls within the range of affected versions, I recognized that this could be a potential attack vector.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/nibbles_cve.webp" alt="CVE details">
+        <img src="../images/nibbles5" alt="CVE details">
       </div>
 
       <p>When I attempted the exploit on the login panel, it unfortunately failed to work as expected. This setback meant that I needed to rethink my approach and find an alternative route for exploitation.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/nibbles_failed_bypass.webp" alt="Failed auth bypass attempt">
+        <img src="../images/nibbles6" alt="Failed auth bypass attempt">
       </div>
 
       <h2>/README Directory & Nibbleblog Version 4.0.3</h2>
       <p>After further exploring the directories revealed by the Nikto scan, I stumbled upon some interesting information in the /README directory. It listed the version of Nibbleblog running on the system as 4.0.3. Curious about potential vulnerabilities for this version, I conducted a web search to see if any known exploits existed. My search led me to an Arbitrary File Upload vulnerability in Nibbleblog version 4.0.3, which was available through Metasploit.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/nibbles_readme.webp" alt="README showing version 4.0.3">
+        <img src="../images/nibbles7" alt="README showing version 4.0.3">
       </div>
 
       <h2>Exploit Success</h2>
@@ -190,6 +190,10 @@ chmod +x monitor.sh</pre>
 root
 # cat /root/root.txt
 42f0681e81e735d308e89a827914275e</pre>
+
+        <div class="big-to-normal-image">
+        <img src="../images/nibbles8" alt="README showing version 4.0.3">
+      </div>
       </div>
     </div>
   </div>

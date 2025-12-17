@@ -34,48 +34,48 @@
       <p>The first step I took to tackle this machine was running an Nmap scan on the host. Once the scan completed, it revealed several interesting ports. I decided to focus my attention on ports 22, 80, 443, and 10000, as they seemed promising for further exploitation.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_nmap1.webp" alt="Nmap initial scan">
-        <img src="../images/beep_nmap2.webp" alt="Nmap detailed results">
+        <img src="../images/beep1.webp" alt="Nmap initial scan">
+        <img src="../images/beep2.webp" alt="Nmap detailed results">
       </div>
 
       <h2>Ports 80 and 443</h2>
       <p>Next, I decided to examine ports 80 and 443. To access the website, I needed to adjust the TLS version in Firefox, as the site was using an older version than my browser’s current settings. I did this by typing about:config in the address bar and changing the security.tls.version.min setting to 1, allowing me to view the site.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_tls_adjust.webp" alt="Adjusting TLS settings in Firefox">
+        <img src="../images/beep3.webp" alt="Adjusting TLS settings in Firefox">
       </div>
 
       <p>After making the adjustment, I gained access to the homepage. I immediately noticed that the website was running Elastix, an open-source unified communications platform.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_elastix_home.webp" alt="Elastix homepage">
+        <img src="../images/beep4.webp" alt="Elastix homepage">
       </div>
 
       <h2>Port 10000</h2>
       <p>I also decided to investigate port 10000 and was greeted by a Webmin login page. I made sure to take note of this, as it could be potentially useful later in the process.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_webmin.webp" alt="Webmin login page">
+        <img src="../images/beep5.webp" alt="Webmin login page">
       </div>
 
       <h2>Gobuster Scan</h2>
       <p>Next, I decided to perform some reconnaissance on the website to uncover any additional information. I ran a directory scan using Gobuster to identify directories that might contain sensitive data. Once the scan finished, I discovered some critical directories, including admin, as well as other potentially sensitive ones like modules and help.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_gobuster.webp" alt="Gobuster results">
+        <img src="../images/beep6.webp" alt="Gobuster results">
       </div>
 
       <h2>Elastix LFI Exploit</h2>
       <p>I proceeded to explore the directories I had found, hoping to uncover any sensitive information, but unfortunately, nothing useful turned up. I then decided to search online for potential Elastix exploits. Almost immediately, I came across a Local File Inclusion (LFI) exploit for Elastix version 2.2.0, and decided to pursue that avenue.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_lfi_exploit.webp" alt="Elastix LFI exploit details">
+        <img src="../images/beep7.webp" alt="Elastix LFI exploit details">
       </div>
 
       <p>The exploit details revealed that Elastix is vulnerable to a Local File Inclusion (LFI) attack due to improper sanitization of user-supplied input. An attacker can leverage this vulnerability to access files and execute local scripts with the privileges of the web server process.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_lfi_success.webp" alt="Successful LFI retrieving credentials">
+        <img src="../images/beep8.webp" alt="Successful LFI retrieving credentials">
       </div>
 
       <p>When I attempted the exploit on the target host, I successfully retrieved a file which contained a list of usernames and passwords. Upon further inspection, I noticed that the website appeared to suffer from password reuse, indicating that all of the usernames likely shared the same password: jEhdIekWmdjE.</p>
@@ -84,44 +84,44 @@
       <p>Next, I attempted to log in to the Elastix dashboard using the username admin and the password jEhdIekWmdjE. The login was successful, granting me access to the dashboard.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_elastix_dashboard.webp" alt="Elastix admin dashboard">
+        <img src="../images/beep9.webp" alt="Elastix admin dashboard">
       </div>
 
       <h2>Webmin Access</h2>
       <p>The next step was to attempt privilege escalation. Unfortunately, I couldn’t find anything useful on the Elastix dashboard to assist with this. Then I remembered that I might also be able to access the Webmin panel on port 10000. After several attempts with different usernames, I successfully logged in using the username root and the same password, jEhdIekWmdjE.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_webmin_dashboard.webp" alt="Webmin dashboard">
+        <img src="../images/beep10.webp" alt="Webmin dashboard">
       </div>
 
       <h2>Command Scheduling for Root</h2>
       <p>After exploring the Webmin panel, I discovered that I had many more options at my disposal. One of these options allowed me to schedule commands for any user, including root.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_webmin_schedule.webp" alt="Scheduling command as root">
+        <img src="../images/beep11.webp" alt="Scheduling command as root">
       </div>
 
       <h2>Reverse Shell</h2>
       <p>I then set up a listener on my local terminal and scheduled a reverse shell command I obtained from PentestMonkey to execute as the root user. This reverse shell would enable me to connect to the target through my local terminal, hopefully granting me root access.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_listener.webp" alt="Netcat listener">
-        <img src="../images/beep_reverse_shell.webp" alt="Root reverse shell received">
+        <img src="../images/beep12.webp" alt="Netcat listener">
+        <img src="../images/beep13.webp" alt="Root reverse shell received">
       </div>
 
       <h2>User Flag</h2>
       <p>Once I obtained root access, I began exploring the directories and found the user flag located in /home/fanis/user.txt.</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_user_flag.webp" alt="User flag">
+        <img src="../images/beep14.webp" alt="User flag">
       </div>
 
       <h2>Root Flag</h2>
       <p>I then located the root flag in /root/root.txt, successfully pwning the Beep machine!</p>
 
       <div class="big-to-normal-image">
-        <img src="../images/beep_root_flag.webp" alt="Root flag">
-        <img src="../images/beep_pwned.webp" alt="Machine pwned">
+        <img src="../images/beep15.webp" alt="Root flag">
+        <img src="../images/beep16.webp" alt="Machine pwned">
       </div>
     </div>
   </div>
